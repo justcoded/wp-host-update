@@ -14,7 +14,7 @@ namespace WpHUp\components {
 		
 		public static function parseRequest()
 		{
-			$controller = 'index';
+			$controller = 'page';
 			$action = 'index';
 			
 			// our request can be in post or get, doesn't matter
