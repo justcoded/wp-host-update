@@ -1,0 +1,15 @@
+body{
+	padding-top: 70px;
+    padding-bottom: 30px;
+}
+.wp-logo{
+	margin:7px 15px 0 0;
+	background-color: #eee; 
+	border-radius: 50%;
+}
+.jumbotron .alert {
+	margin-bottom: 0;
+}
+#replace-form fieldset .row .glyphicon {
+	margin-top: 9px;
+}
