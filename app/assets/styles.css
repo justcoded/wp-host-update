@@ -13,3 +13,9 @@ body{
 #replace-form fieldset .row .glyphicon {
 	margin-top: 9px;
 }
+#replace-form .glyphicon-align-justify {
+	cursor: move;
+}
+#progress-log .row .col-md-1{
+	position: relative;
+}

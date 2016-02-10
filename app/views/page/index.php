@@ -1,5 +1,6 @@
 <?php
-/* @var $data array */
+/* @var $tables array */
+/* @var $default_search_replace array */
 
 include VIEWS_PATH . '/layouts/header.php';
 ?>
@@ -37,35 +38,30 @@ include VIEWS_PATH . '/layouts/header.php';
 			</div>
 			<div class="col-md-1"></div>
 		</div>
-		<fieldset>
+		<fieldset id="find-replace-rows">
+			<?php foreach ($default_search_replace as $params) : ?>
 			<div class="row">
 				<div class="col-md-1 text-right"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></div>
 				<div class="col-md-4">
-					<div class="form-group"><input type="text" class="form-control" name="find[]" placeholder="Old value"></div>
+					<div class="form-group"><input type="text" class="form-control" name="find[]" 
+												   placeholder="<?php echo html_encode($params[0]); ?>" 
+												   value="<?php echo html_encode($params[1]); ?>"></div>
 				</div>
 				<div class="col-md-1 text-center"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></div>
 				<div class="col-md-4">
-					<div class="form-group"><input type="text" class="form-control" name="replace[]" placeholder="New value"></div>
+					<div class="form-group"><input type="text" class="form-control" name="replace[]" 
+												   placeholder="<?php echo html_encode($params[2]); ?>" 
+												   value="<?php echo html_encode($params[3]); ?>"></div>
 				</div>
 				<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
 			</div>
-			<div class="row">
-				<div class="col-md-1 text-right"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></div>
-				<div class="col-md-4">
-					<div class="form-group"><input type="text" class="form-control" name="find[]" placeholder="Old value"></div>
-				</div>
-				<div class="col-md-1 text-center"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></div>
-				<div class="col-md-4">
-					<div class="form-group"><input type="text" class="form-control" name="replace[]" placeholder="New value"></div>
-				</div>
-				<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
-			</div>
+			<?php endforeach; ?>
 		</fieldset>
 		
 		<div class="row">
 			<div class="col-md-1"></div>
 			<div class="col-md-4">
-				<button class="btn">Add Row</button>
+				<button id="find-replace-add-row" class="btn">Add Row</button>
 			</div>
 		</div>
 		
@@ -91,9 +87,7 @@ include VIEWS_PATH . '/layouts/header.php';
 		<div class="form-group hidden" id="custom-tables">
 			<label>Tables to search/replace</label>
 			<select multiple class="form-control">
-				<option>1</option>
-				<option>2</option>
-				<option>3</option>
+				<?php echo html_options($tables); ?>
 			</select>
 		</div>
 		
@@ -101,7 +95,7 @@ include VIEWS_PATH . '/layouts/header.php';
 		<div class="page-header">
 			<h2>That's it!</h2>
 		</div>
-		<button type="submit" class="btn btn-primary">Do the Magic!</button>
+		<button class="btn btn-primary">Do the Magic!</button>
 		
 	</form>
 </section>
