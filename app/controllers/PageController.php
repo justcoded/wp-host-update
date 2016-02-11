@@ -11,7 +11,7 @@ namespace WpHUp\controllers {
 		public function actionIndex()
 		{
 			// get tables list
-			$tables = $this->wpdb->get_col("SHOW TABLES");
+			$tables = $this->wpdb->get_col("SHOW TABLES LIKE '" . $this->wpdb->prefix . "%'");
 			$tables = array_combine($tables, $tables);
 			
 			// get wp options
@@ -48,7 +48,7 @@ namespace WpHUp\controllers {
 			if ( empty($wp_options['wpcontent_path']) ) {
 				unset($default_search_replace[1]);
 			}
-			
+
 			$this->responseStart();
 			include VIEWS_PATH . '/page/index.php';
 		}

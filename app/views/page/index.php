@@ -74,7 +74,7 @@ include VIEWS_PATH . '/layouts/header.php';
 			<div class="radio">
 				<label>
 					<input type="radio" name="tables" value="all" checked>
-					Replace all tables with prefix "wp_" <span class="text-danger">TODO: use prefix from wp-config and filter tables list with this prefix</span>
+					Replace all tables with prefix "<?php echo $this->wpdb->prefix;?>" <span class="text-danger">TODO: use prefix from wp-config and filter tables list with this prefix</span>
 				</label>
 			  </div>
 			<div class="radio">

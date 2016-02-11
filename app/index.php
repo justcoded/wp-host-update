@@ -10,9 +10,9 @@
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
 
-define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../demo-latest/wp-config.php');
+define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../wp44/wp-config.php');
 // test mode:
-define('ABSPATH', dirname(__FILE__) . '/../../demo-latest/cms/');
+define('ABSPATH', dirname(__FILE__) . '/../../wp44/');
 
 include APP_PATH . '/inc/functions.php';
 include APP_PATH . '/components/Router.php';
