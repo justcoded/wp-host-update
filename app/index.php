@@ -18,6 +18,7 @@ include APP_PATH . '/inc/functions.php';
 include APP_PATH . '/components/Router.php';
 include APP_PATH . '/components/Controller.php';
 include APP_PATH . '/controllers/PageController.php';
+include APP_PATH . '/controllers/ProcessController.php';
 
 // loading wp conf file
 $error_action = 'page/configError';

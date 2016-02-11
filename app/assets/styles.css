@@ -16,6 +16,28 @@ body{
 #replace-form .glyphicon-align-justify {
 	cursor: move;
 }
+#progress-log {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
 #progress-log .row .col-md-1{
 	position: relative;
+}
+.bs-callout {
+    padding: 20px 20px 10px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+.bs-callout-warning h4 {
+    color: #aa6708;
 }

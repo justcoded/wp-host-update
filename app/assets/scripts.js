@@ -112,7 +112,7 @@
   var progressBar = {
     spinner: null,
     max: 0,
-    current: 0,
+    value: 0,
     currentStep: 0,
     formData: null
   };
@@ -160,10 +160,11 @@
           return;
         }
 
+        $('.jumbotron').remove();
         $('#replace-form').replaceWith( resp.progress_html );
         progressBar.max = resp.progress_max;
         
-        process_progressbar();
+        process_tables_one_by_one();
       }
     });
   }
@@ -192,14 +193,30 @@
   /**
    * run ajax for each table in request, update progress bar
    */
-  function process_progressbar() {
+  function process_tables_one_by_one() {
     var step = progressBar.currentStep;
+    var lastStep = progressBar.formData.tables_custom.length;
+    
+    // update previous log row if not first step
+    if ( step > 0 ) {
+      progressBar.spinner.stop();
+      
+      var log = $('#progress-log .row:last');
+      var wp_table = progressBar.formData.tables_custom[step-1];
+      log.find('.text').html('Completed with table <span class="text-warning">' + wp_table + '</span>.');
+      log.find('.col-md-1').html('<span class="text-success glyphicon glyphicon-ok"></span>');
+    }
+
+    if ( step == lastStep ) {
+      process_completed_page();
+      return;
+    }
+    
+    // insert new log row
     var wp_table = progressBar.formData.tables_custom[step];
-    
-    $('#progress-log').append( '<div class="row"><div class="col-md-1 text-right indicator"></div><div class="col-md-11 text"></div></div>' );
-    
     progressBar.spinner = new Spinner(spinnerOpts).spin();
-    pa(progressBar.spinner);
+
+    $('#progress-log').append( '<div class="row"><div class="col-md-1 text-right indicator"></div><div class="col-md-11 text"></div></div>' );
     
     var log = $('#progress-log .row:last');
     log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
@@ -207,12 +224,29 @@
     
     var data = progressBar.formData;
     data.step = progressBar.currentStep;
-    ajax_request( 'page/processTable', {
+    ajax_request( 'process/index', {
       data:data,
       success: function(resp) {
-        var valeur = 20;
-        $('.progress-bar').css('width', valeur+'%').attr('aria-valuenow', valeur);    
-        pa('ALL GOOD');
+        // TODO: validate response
+        
+        progressBar.value += resp.updated
+        update_progress_bar();
+        
+        progressBar.currentStep++;
+        process_tables_one_by_one();
+      }
+    })
+  }
+  
+  function update_progress_bar() {
+    var percents = Math.round( progressBar.value * 100 / progressBar.max );
+    $('.progress-bar').css('width', percents+'%').attr('aria-valuenow', percents);    
+  }
+  
+  function process_completed_page() {
+    ajax_request('page/thanks', {
+      success: function(resp) {
+        $('#running').replaceWith(resp);
       }
     })
   }

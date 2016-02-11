@@ -90,20 +90,25 @@ namespace WpHUp\controllers {
 		}
 		
 		/**
-		 * Process replacement for some table
+		 * Thanks page
 		 */
-		public function actionProcessTable()
+		public function actionThanks()
 		{
-			
+			sleep(1);
+			$this->responseStart();
+			include VIEWS_PATH . '/page/_thanks.php';
 		}
 		
+		/*
 		public function actionTest() 
 		{
 			$this->responseStart();
 			include VIEWS_PATH . '/layouts/header.php';
-			include VIEWS_PATH . '/page/_progressbar.php';
+			include VIEWS_PATH . '/page/_thanks.php';
 			include  VIEWS_PATH . '/layouts/footer.php';
 		}
+		 * 
+		 */
 	}
 	
 }

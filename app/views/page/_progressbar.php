@@ -5,7 +5,7 @@
 
 
 	<div class="progress">
-		<div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="<?php echo $total_rows;?>" style="width: 0%">
+		<div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
 			<span class="sr-only">0% Complete (success)</span>
 		</div>
 	</div>
@@ -14,7 +14,8 @@
 	
 	<div class="panel panel-default">
 		<div class="panel-heading">A bit more info while you waiting:</div>
-		<div id="progress-log" class="panel-body">
+		<div class="panel-body">
+			<div id="progress-log">
 			<?php /*
 			<div class="row">
 				<div class="col-md-1 text-right"><span class="text-success glyphicon glyphicon-ok"></span></div>
@@ -26,6 +27,7 @@
 			</div>
 			 * 
 			 */ ?>
+			</div>
 		</div>
 	</div>
 </section>
