@@ -9,10 +9,10 @@
 
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
-
-define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../wp44/wp-config.php');
+define( 'WP_INSTALLING', true );
+define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../townhouse/wp-config.php');
 // test mode:
-define('ABSPATH', dirname(__FILE__) . '/../../wp44/');
+define('ABSPATH', dirname(__FILE__) . '/../../townhouse/');
 
 include APP_PATH . '/inc/functions.php';
 include APP_PATH . '/components/Router.php';

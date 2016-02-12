@@ -228,8 +228,7 @@
       data:data,
       success: function(resp) {
         // TODO: validate response
-        
-        progressBar.value += resp.updated
+        progressBar.value += resp.updated * 1;
         update_progress_bar();
         
         progressBar.currentStep++;
