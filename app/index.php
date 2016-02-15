@@ -32,5 +32,5 @@ if ( ! is_file(WP_CONFIG_PATH) ) {
 	}
 }
 
-\WpHUp\components\Router::callAction();
+Router::callAction();
 exit;
