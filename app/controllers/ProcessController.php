@@ -59,6 +59,13 @@ class ProcessController extends BaseController
 		));
 	}
 
+	/**
+	 * Recursive replace values
+	 * @param string|array $data
+	 * @param boolean $serialized
+	 * @param boolean $parent_serialized
+	 * @return string
+	 */
 	public function recursiveReplace( $data, $serialized = false, $parent_serialized = false )
 	{
 		$is_json = false;
@@ -113,6 +120,12 @@ class ProcessController extends BaseController
 		return $data;
 	}
 
+	/**
+	 * Apply replace
+	 * @param string $subject
+	 * @param boolean $is_serialized
+	 * @return boolean
+	 */
 	public function applyReplaces( $subject, $is_serialized = false )
 	{
 		$search = $_POST['search_replace'];

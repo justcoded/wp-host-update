@@ -218,7 +218,50 @@ class PageController extends BaseController
 	<!-- jQuery UI theme -->
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" crossorigin="anonymous">
 	
-	<link rel="stylesheet" href="assets/styles.css" />
+	<style>body{
+	padding-top: 70px;
+    padding-bottom: 30px;
+}
+.wp-logo{
+	margin:7px 15px 0 0;
+	background-color: #eee; 
+	border-radius: 50%;
+}
+.jumbotron .alert {
+	margin-bottom: 0;
+}
+#replace-form fieldset .row .glyphicon {
+	margin-top: 9px;
+}
+#replace-form .glyphicon-align-justify {
+	cursor: move;
+}
+#progress-log {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#progress-log .row .col-md-1{
+	position: relative;
+}
+.bs-callout {
+    padding: 20px 20px 10px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+.bs-callout-warning h4 {
+    color: #aa6708;
+}
+</style>
 </head>
 <body>
 
@@ -350,7 +393,276 @@ class PageController extends BaseController
 	<!-- spinner -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
 	<!-- custom scripts -->
-	<script src="assets/scripts.js"></script>
+	<script>(function ($) {
+  "use strict";
+  
+  $(document).ready(function(){
+    init_form_tables_switch();
+    init_form_findreplace_rows();
+    init_form_processing();
+  })
+  
+  /**
+   * Safe print helper
+   * @param mixed mixed
+   */
+  function pa(mixed) {
+    if ( window.console )
+      console.log(mixed);
+  }
+  
+  /**
+   * events for radio buttons switcher
+   * show/hide custom tables select
+   */
+  function init_form_tables_switch() {
+    $('#replace-form input[name=tables]').on('click', function(){
+      var val = $('#replace-form input[name=tables]:checked').val();
+      if ( val == 'custom' ) {
+        $('#custom-tables').removeClass('hidden');
+      } else {
+        $('#custom-tables').addClass('hidden');
+      }
+    });
+  }
+  
+  var rowClone;
+  
+  /**
+   * init events and UI for find/replace input rows:
+   * add, delete, sortable
+   * 
+   * @global row_clone;
+   */
+  function init_form_findreplace_rows() {
+    rowClone = $('#find-replace-rows .row:last').clone();
+    
+    // add row event
+    $('#find-replace-add-row').on('click', function(e){
+      e.preventDefault();
+      
+      $('#find-replace-rows').append( rowClone.clone() );
+    });
+    
+    // delete row event
+    $(document).on('click', '#find-replace-rows a.text-danger', function(e){
+      e.preventDefault();
+      
+      // if we have more than one - just remove
+      if ( $('#find-replace-rows .row').size() > 1 ) {
+        $(this).parents('.row').remove();
+      } else {
+        // if only one - just clean input values
+        $('#find-replace-rows .row input:text').val('');
+      }
+    });
+    
+    // init sortable
+    $( "#find-replace-rows" ).sortable({
+      handle: ".glyphicon-align-justify"
+    });
+  }
+  
+  /**
+   * form submit button click event
+   * runs validation of the form
+   */
+  function init_form_processing() {
+    $('#replace-form button.btn-primary').click(function(e){
+      e.preventDefault();
+      
+      var replace_rows = $('#find-replace-rows .row');
+      var search_condition_error = false;
+      var confirm_required = false;
+      for ( var i = 0; i < replace_rows.size(); i++ ) {
+        var row = replace_rows[i];
+        $('.form-group', row).removeClass('has-error').addClass('has-success');
+        
+        var search_empty = ( $.trim($('input:first', row).val()) == '' );
+        var replace_empty = ( $.trim($('input:last', row).val()) == '' );
+        
+        if ( search_empty && !replace_empty ) {
+          $('.form-group', row).addClass('has-error').removeClass('has-success');
+          search_condition_error = true;
+        }
+        
+        if ( !search_empty && replace_empty ) {
+          $('.form-group', row).addClass('has-error').removeClass('has-success');
+          confirm_required = true;
+        }
+      }
+      
+      if ( search_condition_error && ! alert("You specified wrond search input in some of the rows.\nPlease correct before we can do Magic!") ) {
+        return false;
+      }
+      
+      if ( confirm_required && !confirm("You specified empty replace string(s).\nThis can harm you database.\nAre you sure you want to continue?") ) {
+        return false;
+      }
+      
+      process_findreplace_form_submit();
+    })
+  }
+  
+  var progressBar = {
+    spinner: null,
+    max: 0,
+    value: 0,
+    currentStep: 0,
+    formData: null
+  };
+  
+  /**
+   * form submit ajax and progress bars
+   */
+  function process_findreplace_form_submit() {
+    // collect values
+    var replace_rows = $('#find-replace-rows .row');
+    var tables_choice = $('#replace-form input[name=tables]:checked').val();
+      // autoselect options if "all" selected
+      if ( tables_choice == 'all' ) {
+        $('#custom-tables select option').attr('selected', true);
+      }
+    var tables_custom = $('#custom-tables select').val();
+
+    var search_replace = [];
+    for ( var i=0; i < replace_rows.size(); i++ ) {
+      var row = replace_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      search_replace.push( [search, replace] );
+    }
+
+    progressBar.formData = {
+      search_replace: search_replace,
+      tables_choice: tables_choice,
+      tables_custom: tables_custom
+    };
+
+    pa(progressBar.formData);
+
+    ajax_request('page/run', {
+      data: progressBar.formData,
+      success: function(resp) {
+        // validate response
+        if ( typeof(resp) != 'object' ) {
+          alert('Bad server response');
+          return;
+        }
+        if ( resp.error ) {
+          alert(resp.error);
+          return;
+        }
+
+        $('.jumbotron').remove();
+        $('#replace-form').replaceWith( resp.progress_html );
+        progressBar.max = resp.progress_max;
+        
+        process_tables_one_by_one();
+      }
+    });
+  }
+  
+  var spinnerOpts = {
+      lines: 7 // The number of lines to draw
+    , length: 6 // The length of each line
+    , width: 2 // The line thickness
+    , radius: 2 // The radius of the inner circle
+    , scale: 1 // Scales overall size of the spinner
+    , corners: 1 // Corner roundness (0..1)
+    , color: '#000' // #rgb or #rrggbb or array of colors
+    , opacity: 0.25 // Opacity of the lines
+    , rotate: 0 // The rotation offset
+    , direction: 1 // 1: clockwise, -1: counterclockwise
+    , speed: 1 // Rounds per second
+    , trail: 60 // Afterglow percentage
+    , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+    , zIndex: 2e9 // The z-index (defaults to 2000000000)
+    , className: 'spinner' // The CSS class to assign to the spinner
+    , top: '9px' // Top position relative to parent
+    , left: '77%' // Left position relative to parent
+    , position: 'absolute' // Element positioning    
+    };
+    
+  /**
+   * run ajax for each table in request, update progress bar
+   */
+  function process_tables_one_by_one() {
+    var step = progressBar.currentStep;
+    var lastStep = progressBar.formData.tables_custom.length;
+    
+    // update previous log row if not first step
+    if ( step > 0 ) {
+      progressBar.spinner.stop();
+      
+      var log = $('#progress-log .row:last');
+      var wp_table = progressBar.formData.tables_custom[step-1];
+      log.find('.text').html('Completed with table <span class="text-warning">' + wp_table + '</span>.');
+      log.find('.col-md-1').html('<span class="text-success glyphicon glyphicon-ok"></span>');
+    }
+
+    if ( step == lastStep ) {
+      process_completed_page();
+      return;
+    }
+    
+    // insert new log row
+    var wp_table = progressBar.formData.tables_custom[step];
+    progressBar.spinner = new Spinner(spinnerOpts).spin();
+
+    $('#progress-log').append( '<div class="row"><div class="col-md-1 text-right indicator"></div><div class="col-md-11 text"></div></div>' );
+    
+    var log = $('#progress-log .row:last');
+    log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
+    log.find('.col-md-1').append(progressBar.spinner.el);
+    
+    var data = progressBar.formData;
+    data.step = progressBar.currentStep;
+    ajax_request( 'process/index', {
+      data:data,
+      success: function(resp) {
+        // TODO: validate response
+        progressBar.value += resp.updated * 1;
+        update_progress_bar();
+        
+        progressBar.currentStep++;
+        process_tables_one_by_one();
+      }
+    })
+  }
+  
+  function update_progress_bar() {
+    var percents = Math.round( progressBar.value * 100 / progressBar.max );
+    $('.progress-bar').css('width', percents+'%').attr('aria-valuenow', percents);    
+  }
+  
+  function process_completed_page() {
+    ajax_request('page/thanks', {
+      success: function(resp) {
+        $('#running').replaceWith(resp);
+      }
+    })
+  }
+  
+  /**
+   * call ajax request
+   * 
+   * @param string action  controller/action string
+   * @param object params  ajax params
+   */
+  function ajax_request(action, params) {
+    var basePath = window.location.pathname;
+    params.url = basePath + '?r=' + action;
+    
+    if ( ! params.type ) params.type = 'POST';
+    
+    pa(params);
+    
+    $.ajax(params);
+  }
+  
+}(jQuery));</script>
 
 </body>
 </html><?php ?><?php
@@ -378,7 +690,50 @@ class PageController extends BaseController
 	<!-- jQuery UI theme -->
 	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" crossorigin="anonymous">
 	
-	<link rel="stylesheet" href="assets/styles.css" />
+	<style>body{
+	padding-top: 70px;
+    padding-bottom: 30px;
+}
+.wp-logo{
+	margin:7px 15px 0 0;
+	background-color: #eee; 
+	border-radius: 50%;
+}
+.jumbotron .alert {
+	margin-bottom: 0;
+}
+#replace-form fieldset .row .glyphicon {
+	margin-top: 9px;
+}
+#replace-form .glyphicon-align-justify {
+	cursor: move;
+}
+#progress-log {
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+#progress-log .row .col-md-1{
+	position: relative;
+}
+.bs-callout {
+    padding: 20px 20px 10px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 3px;
+}
+.bs-callout h4 {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+.bs-callout-warning {
+    border-left-color: #aa6708;
+}
+.bs-callout-warning h4 {
+    color: #aa6708;
+}
+</style>
 </head>
 <body>
 
@@ -419,7 +774,276 @@ class PageController extends BaseController
 	<!-- spinner -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
 	<!-- custom scripts -->
-	<script src="assets/scripts.js"></script>
+	<script>(function ($) {
+  "use strict";
+  
+  $(document).ready(function(){
+    init_form_tables_switch();
+    init_form_findreplace_rows();
+    init_form_processing();
+  })
+  
+  /**
+   * Safe print helper
+   * @param mixed mixed
+   */
+  function pa(mixed) {
+    if ( window.console )
+      console.log(mixed);
+  }
+  
+  /**
+   * events for radio buttons switcher
+   * show/hide custom tables select
+   */
+  function init_form_tables_switch() {
+    $('#replace-form input[name=tables]').on('click', function(){
+      var val = $('#replace-form input[name=tables]:checked').val();
+      if ( val == 'custom' ) {
+        $('#custom-tables').removeClass('hidden');
+      } else {
+        $('#custom-tables').addClass('hidden');
+      }
+    });
+  }
+  
+  var rowClone;
+  
+  /**
+   * init events and UI for find/replace input rows:
+   * add, delete, sortable
+   * 
+   * @global row_clone;
+   */
+  function init_form_findreplace_rows() {
+    rowClone = $('#find-replace-rows .row:last').clone();
+    
+    // add row event
+    $('#find-replace-add-row').on('click', function(e){
+      e.preventDefault();
+      
+      $('#find-replace-rows').append( rowClone.clone() );
+    });
+    
+    // delete row event
+    $(document).on('click', '#find-replace-rows a.text-danger', function(e){
+      e.preventDefault();
+      
+      // if we have more than one - just remove
+      if ( $('#find-replace-rows .row').size() > 1 ) {
+        $(this).parents('.row').remove();
+      } else {
+        // if only one - just clean input values
+        $('#find-replace-rows .row input:text').val('');
+      }
+    });
+    
+    // init sortable
+    $( "#find-replace-rows" ).sortable({
+      handle: ".glyphicon-align-justify"
+    });
+  }
+  
+  /**
+   * form submit button click event
+   * runs validation of the form
+   */
+  function init_form_processing() {
+    $('#replace-form button.btn-primary').click(function(e){
+      e.preventDefault();
+      
+      var replace_rows = $('#find-replace-rows .row');
+      var search_condition_error = false;
+      var confirm_required = false;
+      for ( var i = 0; i < replace_rows.size(); i++ ) {
+        var row = replace_rows[i];
+        $('.form-group', row).removeClass('has-error').addClass('has-success');
+        
+        var search_empty = ( $.trim($('input:first', row).val()) == '' );
+        var replace_empty = ( $.trim($('input:last', row).val()) == '' );
+        
+        if ( search_empty && !replace_empty ) {
+          $('.form-group', row).addClass('has-error').removeClass('has-success');
+          search_condition_error = true;
+        }
+        
+        if ( !search_empty && replace_empty ) {
+          $('.form-group', row).addClass('has-error').removeClass('has-success');
+          confirm_required = true;
+        }
+      }
+      
+      if ( search_condition_error && ! alert("You specified wrond search input in some of the rows.\nPlease correct before we can do Magic!") ) {
+        return false;
+      }
+      
+      if ( confirm_required && !confirm("You specified empty replace string(s).\nThis can harm you database.\nAre you sure you want to continue?") ) {
+        return false;
+      }
+      
+      process_findreplace_form_submit();
+    })
+  }
+  
+  var progressBar = {
+    spinner: null,
+    max: 0,
+    value: 0,
+    currentStep: 0,
+    formData: null
+  };
+  
+  /**
+   * form submit ajax and progress bars
+   */
+  function process_findreplace_form_submit() {
+    // collect values
+    var replace_rows = $('#find-replace-rows .row');
+    var tables_choice = $('#replace-form input[name=tables]:checked').val();
+      // autoselect options if "all" selected
+      if ( tables_choice == 'all' ) {
+        $('#custom-tables select option').attr('selected', true);
+      }
+    var tables_custom = $('#custom-tables select').val();
+
+    var search_replace = [];
+    for ( var i=0; i < replace_rows.size(); i++ ) {
+      var row = replace_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      search_replace.push( [search, replace] );
+    }
+
+    progressBar.formData = {
+      search_replace: search_replace,
+      tables_choice: tables_choice,
+      tables_custom: tables_custom
+    };
+
+    pa(progressBar.formData);
+
+    ajax_request('page/run', {
+      data: progressBar.formData,
+      success: function(resp) {
+        // validate response
+        if ( typeof(resp) != 'object' ) {
+          alert('Bad server response');
+          return;
+        }
+        if ( resp.error ) {
+          alert(resp.error);
+          return;
+        }
+
+        $('.jumbotron').remove();
+        $('#replace-form').replaceWith( resp.progress_html );
+        progressBar.max = resp.progress_max;
+        
+        process_tables_one_by_one();
+      }
+    });
+  }
+  
+  var spinnerOpts = {
+      lines: 7 // The number of lines to draw
+    , length: 6 // The length of each line
+    , width: 2 // The line thickness
+    , radius: 2 // The radius of the inner circle
+    , scale: 1 // Scales overall size of the spinner
+    , corners: 1 // Corner roundness (0..1)
+    , color: '#000' // #rgb or #rrggbb or array of colors
+    , opacity: 0.25 // Opacity of the lines
+    , rotate: 0 // The rotation offset
+    , direction: 1 // 1: clockwise, -1: counterclockwise
+    , speed: 1 // Rounds per second
+    , trail: 60 // Afterglow percentage
+    , fps: 20 // Frames per second when using setTimeout() as a fallback for CSS
+    , zIndex: 2e9 // The z-index (defaults to 2000000000)
+    , className: 'spinner' // The CSS class to assign to the spinner
+    , top: '9px' // Top position relative to parent
+    , left: '77%' // Left position relative to parent
+    , position: 'absolute' // Element positioning    
+    };
+    
+  /**
+   * run ajax for each table in request, update progress bar
+   */
+  function process_tables_one_by_one() {
+    var step = progressBar.currentStep;
+    var lastStep = progressBar.formData.tables_custom.length;
+    
+    // update previous log row if not first step
+    if ( step > 0 ) {
+      progressBar.spinner.stop();
+      
+      var log = $('#progress-log .row:last');
+      var wp_table = progressBar.formData.tables_custom[step-1];
+      log.find('.text').html('Completed with table <span class="text-warning">' + wp_table + '</span>.');
+      log.find('.col-md-1').html('<span class="text-success glyphicon glyphicon-ok"></span>');
+    }
+
+    if ( step == lastStep ) {
+      process_completed_page();
+      return;
+    }
+    
+    // insert new log row
+    var wp_table = progressBar.formData.tables_custom[step];
+    progressBar.spinner = new Spinner(spinnerOpts).spin();
+
+    $('#progress-log').append( '<div class="row"><div class="col-md-1 text-right indicator"></div><div class="col-md-11 text"></div></div>' );
+    
+    var log = $('#progress-log .row:last');
+    log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
+    log.find('.col-md-1').append(progressBar.spinner.el);
+    
+    var data = progressBar.formData;
+    data.step = progressBar.currentStep;
+    ajax_request( 'process/index', {
+      data:data,
+      success: function(resp) {
+        // TODO: validate response
+        progressBar.value += resp.updated * 1;
+        update_progress_bar();
+        
+        progressBar.currentStep++;
+        process_tables_one_by_one();
+      }
+    })
+  }
+  
+  function update_progress_bar() {
+    var percents = Math.round( progressBar.value * 100 / progressBar.max );
+    $('.progress-bar').css('width', percents+'%').attr('aria-valuenow', percents);    
+  }
+  
+  function process_completed_page() {
+    ajax_request('page/thanks', {
+      success: function(resp) {
+        $('#running').replaceWith(resp);
+      }
+    })
+  }
+  
+  /**
+   * call ajax request
+   * 
+   * @param string action  controller/action string
+   * @param object params  ajax params
+   */
+  function ajax_request(action, params) {
+    var basePath = window.location.pathname;
+    params.url = basePath + '?r=' + action;
+    
+    if ( ! params.type ) params.type = 'POST';
+    
+    pa(params);
+    
+    $.ajax(params);
+  }
+  
+}(jQuery));</script>
 
 </body>
 </html><?php ?>	<?php
@@ -507,80 +1131,7 @@ class PageController extends BaseController
 </section><?php
 	}
 
-	/*
-	public function actionTest() 
-	{
-		$this->responseStart();
-		?><!DOCTYPE HTML>
-<html>
-<head>
-	<title>WordPress Host Update script</title>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-	<!-- Bootstrap: Latest compiled and minified CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-	<!-- Bootstrap: Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-	
-	<!-- jQuery UI theme -->
-	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" crossorigin="anonymous">
-	
-	<link rel="stylesheet" href="assets/styles.css" />
-</head>
-<body>
-
-	<!-- Page Wrapper -->
-	<div id="page-wrapper">
-	
-		<!-- Fixed navbar -->
-		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container">
-				<div class="navbar-header">
-					<img class="pull-left wp-logo" src="https://s.w.org/about/images/logos/wordpress-logo-notext-rgb.png" width="32px" height="32px" alt="WordPress">
-
-					<span class="navbar-brand">WordPress Host Update script</span>
-				</div>
-
-			</div>
-		</nav>
-
-		<div id="main" class="container theme-showcase" role="main">
-
-<?php
-		?><section id="thanks">
-	<div class="well">
-		<h1>Thank you for using our script.</h1>
-		<p>We hope all went well and your site is working well!</p>
-		<p><a href="?r=page/index" class="btn btn-primary">Back</a></p>
-	</div>
-
-	<div class="bs-callout bs-callout-warning">
-		<h4>Having problems?</h4>
-		<p>If you have problems with our script or have any suggestions, please write to us at our public repository:</p> 
-		<p class="text-primary"><a href="https://bitbucket.org/justcoded/tools_wp_host_update/issues?status=new&status=open" target="_blank">http://bitbucket.org/justcoded/tools_wp_host_update</a></p>
-	</div>
-</section><?php
-		?>		</div> <!-- #main -->
-	</div> <!-- #page-wrapper -->
-
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<!-- jQuery UI -->
-	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-	<!-- Bootstrap Latest compiled and minified JavaScript -->
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-	<!-- spinner -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
-	<!-- custom scripts -->
-	<script src="assets/scripts.js"></script>
-
-</body>
-</html><?php
-	}
-	 * 
-	 */
 }
 
 
@@ -645,6 +1196,13 @@ class ProcessController extends BaseController
 		));
 	}
 
+	/**
+	 * Recursive replace values
+	 * @param string|array $data
+	 * @param boolean $serialized
+	 * @param boolean $parent_serialized
+	 * @return string
+	 */
 	public function recursiveReplace( $data, $serialized = false, $parent_serialized = false )
 	{
 		$is_json = false;
@@ -699,6 +1257,12 @@ class ProcessController extends BaseController
 		return $data;
 	}
 
+	/**
+	 * Apply replace
+	 * @param string $subject
+	 * @param boolean $is_serialized
+	 * @return boolean
+	 */
 	public function applyReplaces( $subject, $is_serialized = false )
 	{
 		$search = $_POST['search_replace'];

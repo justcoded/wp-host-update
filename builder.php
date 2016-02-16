@@ -28,6 +28,8 @@ function get_content( $file, $content = '', $include_path = null )
 {
 	$pattern = '/include [a-zA-Z\.\/\_\'\- ]*;/';
 	$views_pattern = '/include( *)VIEWS_PATH[a-zA-Z\.\/\_\'\- ]*;/';
+	$script_pattern = '/<script src="[a-zA-Z\.\/\_\'\-]*"><\/script>/';
+	$style_pattern = '/<link rel="stylesheet" href="[a-zA-Z\.\/\_\'\-]*"(.*?)\/>/';
 
 	if ( !is_dir($file) ) {
 		$file_content = file_get_contents($file);
@@ -38,7 +40,32 @@ function get_content( $file, $content = '', $include_path = null )
 				$file_content = str_replace('<?php', '', str_replace('?\>', '', $file_content));
 			}
 			else {
+				preg_match_all($script_pattern, $file_content, $scripts);
+				preg_match_all($style_pattern, $file_content, $styles);
+
 				$file_content = '?' . '>' . $file_content . '<' . '?' . 'php';
+
+				if ( !empty($scripts[0]) ) {
+					foreach ($scripts[0] as $script) {
+						$script_path = str_replace('></script>', '', str_replace('<script src=', '', $script));
+						$script_path = str_replace('"', '', $script_path);
+						$new_script = '<script>';
+						$new_script .= file_get_contents(APP_PATH . '/' . trim($script_path));
+						$new_script .= '</script>';
+						$file_content = str_replace($script, $new_script, $file_content);
+					}
+				}
+				
+				if ( !empty($styles[0]) ) {
+					foreach ($styles[0] as $style) {
+						$style_path = str_replace('/>', '', str_replace('<link rel="stylesheet" href=', '', $style));
+						$style_path = str_replace('"', '', $style_path);
+						$new_style = '<style>';
+						$new_style .= file_get_contents(APP_PATH . '/' . trim($style_path));
+						$new_style .= '</style>';
+						$file_content = str_replace($style, $new_style, $file_content);
+					}
+				}
 			}
 		}
 		else {
