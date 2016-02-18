@@ -123,6 +123,7 @@
   function process_findreplace_form_submit() {
     // collect values
     var replace_rows = $('#find-replace-rows .row');
+    var domain_rows = $('#find-multisite-rows .row');
     var tables_choice = $('#replace-form input[name=tables]:checked').val();
       // autoselect options if "all" selected
       if ( tables_choice == 'all' ) {
@@ -138,9 +139,18 @@
 
       search_replace.push( [search, replace] );
     }
+    var domain_replace = [];
+    for ( var i=0; i < domain_rows.size(); i++ ) {
+      var row = domain_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      domain_replace.push( [search, replace] );
+    }
 
     progressBar.formData = {
       search_replace: search_replace,
+      domain_replace: domain_replace,
       tables_choice: tables_choice,
       tables_custom: tables_custom
     };

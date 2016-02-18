@@ -43,6 +43,15 @@ class PageController extends BaseController
 			),
 		);
 
+		if (MULTISITE) {
+			$new_domain = $this->getDomain($_SERVER['HTTP_REFERER']);
+			$old_domain = $this->getDomain(get_option('home'));
+			$domain_replace = array(
+				'old_domain' => $old_domain,
+				'new_domain' => $new_domain
+			);
+		}
+
 		// if we don't have in DB old filepath - then user can add it manually
 		if ( empty($wp_options['wpcontent_path']) ) {
 			unset($default_search_replace[1]);
@@ -50,6 +59,17 @@ class PageController extends BaseController
 
 		$this->responseStart();
 		include VIEWS_PATH . '/page/index.php';
+	}
+
+	public function getDomain( $url )
+	{
+		$url = parse_url($url);
+
+		if (SUBDOMAIN_INSTALL) {
+			$url['host'] = '*.' . $url['host'];
+		}
+
+		return $url['host'];
 	}
 
 	/**

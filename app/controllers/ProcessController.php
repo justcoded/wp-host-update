@@ -37,25 +37,32 @@ class ProcessController extends BaseController
 			$i = 1;
 			$rows_counter = count((array)$row);
 
+			
+
 			foreach ( $row as $key => $value ) {
 				if ( $i == 1 ) {
 					$where = " WHERE $key=$value";
 					$i++;
 					continue;
 				}
+				if ( strpos($curent_table, 'blogs') ) {
+					$value = $this->applyReplaces($value, true);
+				}
+				else {
+					$value = $this->recursiveReplace($value);
+				}
 
-				$value = $this->recursiveReplace($value);
 				$update .= $i == 2 ? "" : ",";
 				$update .= $key . "='" . $this->sqlAddslashes($value) . "'";
 				$i++;
 			}
-			$wpdb->query($insert . $where);
+			$wpdb->query($update . $where);
 			$updated_tables++;
 		}
 
 		sleep(1);
 		return $this->responseJson(array(
-					'updated' => $updated_tables,
+			'updated' => $updated_tables,
 		));
 	}
 
@@ -108,7 +115,7 @@ class ProcessController extends BaseController
 			$is_json = true;
 		}
 		elseif ( is_string($data) ) {
-			$data = $this->applyReplaces($data, $parent_serialized);
+			$data = $this->applyReplaces($data);
 		}
 
 		if ( $serialized )
@@ -126,9 +133,9 @@ class ProcessController extends BaseController
 	 * @param boolean $is_serialized
 	 * @return boolean
 	 */
-	public function applyReplaces( $subject, $is_serialized = false )
+	public function applyReplaces( $subject, $is_blogs = false )
 	{
-		$search = $_POST['search_replace'];
+		$search = !empty($is_blogs) ? $_POST['domain_replace'] : $_POST['search_replace'];
 
 		foreach ( $search as $replace ) {
 			$subject = str_ireplace($replace[0], $replace[1], $subject);
@@ -136,6 +143,12 @@ class ProcessController extends BaseController
 		return $subject;
 	}
 
+	/**
+	 * 
+	 * @param string $string
+	 * @param boolean $strict
+	 * @return boolean
+	 */
 	public function isJson( $string, $strict = false )
 	{
 		$json = @json_decode($string, true);
