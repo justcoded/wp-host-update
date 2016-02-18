@@ -10,9 +10,9 @@
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
 define( 'WP_INSTALLING', true );
-define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../townhouse/wp-config.php');
+define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../mswp/wp-config.php');
 // test mode:
-define('ABSPATH', dirname(__FILE__) . '/../../townhouse/');
+define('ABSPATH', dirname(__FILE__) . '/../../mswp/');
 
 
 
@@ -192,6 +192,22 @@ class PageController extends BaseController
 			),
 		);
 
+		if (MULTISITE) {
+			$new_domain = $_SERVER['HTTP_HOST'];
+			$home_url = parse_url(get_option('home'));
+			$old_domain = $home_url['host'];
+
+			if ( SUBDOMAIN_INSTALL ) {
+				$new_domain = '*.' . $new_domain;
+				$old_domain = '*.' . $old_domain;
+			}
+
+			$domain_replace = array(
+				'old_domain' => $old_domain,
+				'new_domain' => $new_domain
+			);
+		}
+
 		// if we don't have in DB old filepath - then user can add it manually
 		if ( empty($wp_options['wpcontent_path']) ) {
 			unset($default_search_replace[1]);
@@ -331,7 +347,7 @@ class PageController extends BaseController
 				<div class="col-md-4">
 					<div class="form-group"><input type="text" class="form-control" name="replace[]" 
 												   placeholder="<?php echo html_encode($params[2]); ?>" 
-												   value="<?php echo html_encode($params[3]); ?>"></div>
+												   value="<?php echo html_encode(preg_replace('/\?.*/', '', $params[3])); ?>"></div>
 				</div>
 				<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
 			</div>
@@ -344,7 +360,43 @@ class PageController extends BaseController
 				<button id="find-replace-add-row" class="btn">Add Row</button>
 			</div>
 		</div>
-		
+
+		<?php if ( MULTISITE ) : ?>
+			<!-- find replace block -->
+			<div class="page-header">
+				<h2>Multisite configuration</h2>
+			</div>
+
+			<div class="row form-header">
+				<div class="col-md-1"></div>
+				<div class="col-md-4">
+					<h4>Old Domain</h4>
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-4">
+					<h4>New Domain</h4>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<fieldset id="find-multisite-rows">
+				<div class="row">
+					<div class="col-md-1 text-right"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></div>
+					<div class="col-md-4">
+						<div class="form-group"><input type="text" class="form-control" name="old_domain[]" 
+													   placeholder="<?php echo 'Old domain'; ?>" 
+													   value="<?php echo html_encode($domain_replace['old_domain']); ?>"></div>
+					</div>
+					<div class="col-md-1 text-center"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></div>
+					<div class="col-md-4">
+						<div class="form-group"><input type="text" class="form-control" name="new_domain[]" 
+													   placeholder="<?php echo 'New domain'; ?>" 
+													   value="<?php echo html_encode($domain_replace['new_domain']); ?>"></div>
+					</div>
+					<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
+				</div>
+			</fieldset>
+		<?php endif; ?>	
+
 		<!-- Advanced options -->
 		<div class="page-header">
 			<h2>Advanced options</h2>
@@ -518,6 +570,7 @@ class PageController extends BaseController
   function process_findreplace_form_submit() {
     // collect values
     var replace_rows = $('#find-replace-rows .row');
+    var domain_rows = $('#find-multisite-rows .row');
     var tables_choice = $('#replace-form input[name=tables]:checked').val();
       // autoselect options if "all" selected
       if ( tables_choice == 'all' ) {
@@ -533,9 +586,18 @@ class PageController extends BaseController
 
       search_replace.push( [search, replace] );
     }
+    var domain_replace = [];
+    for ( var i=0; i < domain_rows.size(); i++ ) {
+      var row = domain_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      domain_replace.push( [search, replace] );
+    }
 
     progressBar.formData = {
       search_replace: search_replace,
+      domain_replace: domain_replace,
       tables_choice: tables_choice,
       tables_custom: tables_custom
     };
@@ -899,6 +961,7 @@ class PageController extends BaseController
   function process_findreplace_form_submit() {
     // collect values
     var replace_rows = $('#find-replace-rows .row');
+    var domain_rows = $('#find-multisite-rows .row');
     var tables_choice = $('#replace-form input[name=tables]:checked').val();
       // autoselect options if "all" selected
       if ( tables_choice == 'all' ) {
@@ -914,9 +977,18 @@ class PageController extends BaseController
 
       search_replace.push( [search, replace] );
     }
+    var domain_replace = [];
+    for ( var i=0; i < domain_rows.size(); i++ ) {
+      var row = domain_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      domain_replace.push( [search, replace] );
+    }
 
     progressBar.formData = {
       search_replace: search_replace,
+      domain_replace: domain_replace,
       tables_choice: tables_choice,
       tables_custom: tables_custom
     };
@@ -1131,7 +1203,6 @@ class PageController extends BaseController
 </section><?php
 	}
 
-
 }
 
 
@@ -1174,25 +1245,32 @@ class ProcessController extends BaseController
 			$i = 1;
 			$rows_counter = count((array)$row);
 
+			
+
 			foreach ( $row as $key => $value ) {
 				if ( $i == 1 ) {
 					$where = " WHERE $key=$value";
 					$i++;
 					continue;
 				}
+				if ( strpos($curent_table, 'blogs') ) {
+					$value = $this->applyReplaces($value, true);
+				}
+				else {
+					$value = $this->recursiveReplace($value);
+				}
 
-				$value = $this->recursiveReplace($value);
 				$update .= $i == 2 ? "" : ",";
 				$update .= $key . "='" . $this->sqlAddslashes($value) . "'";
 				$i++;
 			}
-			$wpdb->query($insert . $where);
+			$wpdb->query($update . $where);
 			$updated_tables++;
 		}
 
 		sleep(1);
 		return $this->responseJson(array(
-					'updated' => $updated_tables,
+			'updated' => $updated_tables,
 		));
 	}
 
@@ -1245,7 +1323,7 @@ class ProcessController extends BaseController
 			$is_json = true;
 		}
 		elseif ( is_string($data) ) {
-			$data = $this->applyReplaces($data, $parent_serialized);
+			$data = $this->applyReplaces($data);
 		}
 
 		if ( $serialized )
@@ -1263,9 +1341,9 @@ class ProcessController extends BaseController
 	 * @param boolean $is_serialized
 	 * @return boolean
 	 */
-	public function applyReplaces( $subject, $is_serialized = false )
+	public function applyReplaces( $subject, $is_blogs = false )
 	{
-		$search = $_POST['search_replace'];
+		$search = !empty($is_blogs) ? $_POST['domain_replace'] : $_POST['search_replace'];
 
 		foreach ( $search as $replace ) {
 			$subject = str_ireplace($replace[0], $replace[1], $subject);
@@ -1273,6 +1351,12 @@ class ProcessController extends BaseController
 		return $subject;
 	}
 
+	/**
+	 * 
+	 * @param string $string
+	 * @param boolean $strict
+	 * @return boolean
+	 */
 	public function isJson( $string, $strict = false )
 	{
 		$json = @json_decode($string, true);

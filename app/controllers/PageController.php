@@ -44,8 +44,15 @@ class PageController extends BaseController
 		);
 
 		if (MULTISITE) {
-			$new_domain = $this->getDomain($_SERVER['HTTP_REFERER']);
-			$old_domain = $this->getDomain(get_option('home'));
+			$new_domain = $_SERVER['HTTP_HOST'];
+			$home_url = parse_url(get_option('home'));
+			$old_domain = $home_url['host'];
+
+			if ( SUBDOMAIN_INSTALL ) {
+				$new_domain = '*.' . $new_domain;
+				$old_domain = '*.' . $old_domain;
+			}
+
 			$domain_replace = array(
 				'old_domain' => $old_domain,
 				'new_domain' => $new_domain
@@ -59,17 +66,6 @@ class PageController extends BaseController
 
 		$this->responseStart();
 		include VIEWS_PATH . '/page/index.php';
-	}
-
-	public function getDomain( $url )
-	{
-		$url = parse_url($url);
-
-		if (SUBDOMAIN_INSTALL) {
-			$url['host'] = '*.' . $url['host'];
-		}
-
-		return $url['host'];
 	}
 
 	/**
@@ -118,15 +114,5 @@ class PageController extends BaseController
 		include VIEWS_PATH . '/page/_thanks.php';
 	}
 
-	/*
-	public function actionTest() 
-	{
-		$this->responseStart();
-		include VIEWS_PATH . '/layouts/header.php';
-		include VIEWS_PATH . '/page/_thanks.php';
-		include VIEWS_PATH . '/layouts/footer.php';
-	}
-	 * 
-	 */
 }
 
