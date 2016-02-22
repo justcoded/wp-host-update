@@ -90,7 +90,6 @@ function get_content( $file, $content = '', $include_path = null )
 
 	$content = preg_replace('@\\s*/\\*([\\s\\S]*?)\\*/\\s*@', '' . "\n", $content);
 	$content = preg_replace('/<!--(.*?)-->/', '', $content);
-	$content = preg_replace('/\/\/([\\s\\S]*)\\n$/', '', $content);
 	return $content;
 }
 
