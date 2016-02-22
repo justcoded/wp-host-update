@@ -199,7 +199,8 @@
     , left: '77%' // Left position relative to parent
     , position: 'absolute' // Element positioning    
     };
-    
+  
+  var progress_scroll = 0;
   /**
    * run ajax for each table in request, update progress bar
    */
@@ -231,7 +232,9 @@
     var log = $('#progress-log .row:last');
     log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
     log.find('.col-md-1').append(progressBar.spinner.el);
-    
+    progress_scroll += 20;
+    $('#progress-log').animate({scrollTop:progress_scroll}, 'fast');
+
     var data = progressBar.formData;
     data.step = progressBar.currentStep;
     ajax_request( 'process/index', {

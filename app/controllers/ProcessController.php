@@ -25,42 +25,38 @@ class ProcessController extends BaseController
 		global $wpdb;
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];
-		$curent_table = $tables[$step];
+		$current_table = $tables[$step];
 		$updated_tables = 0;
 
-		$select = "SELECT " . $curent_table . ".* FROM " . $curent_table;
+		$select = "SELECT " . $current_table . ".* FROM " . $current_table;
 		$datas = $wpdb->get_results($select);
+		$primary_keys = $wpdb->get_results("SHOW KEYS FROM `$current_table` WHERE Key_name = 'PRIMARY'");
 
 		foreach ( $datas as $row ) {
-			$values = array();
-			$update = "UPDATE $curent_table SET ";
+			$update = "UPDATE $current_table SET ";
 			$i = 1;
-			$rows_counter = count((array)$row);
-
-			
 
 			foreach ( $row as $key => $value ) {
-				if ( $i == 1 ) {
+				if ( $primary_keys[0]->Column_name == $key ) {
 					$where = " WHERE $key=$value";
 					$i++;
 					continue;
 				}
-				if ( strpos($curent_table, 'blogs') ) {
+
+				if ( strpos($current_table, 'blogs') ) {
 					$value = $this->applyReplaces($value, true);
 				}
 				else {
 					$value = $this->recursiveReplace($value);
 				}
 
-				$update .= $i == 2 ? "" : ",";
-				$update .= $key . "='" . $this->sqlAddslashes($value) . "'";
+				$update_values[] =  $key . "='" . $this->sqlAddslashes($value) . "'";
 				$i++;
 			}
+			$update .= implode(',', $update_values);
 			$wpdb->query($update . $where);
 			$updated_tables++;
 		}
-
-		sleep(1);
 		return $this->responseJson(array(
 			'updated' => $updated_tables,
 		));
