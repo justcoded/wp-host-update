@@ -56,8 +56,8 @@ function get_content( $file, $content = '', $include_path = null )
 			foreach ( $scripts[0] as $script ) {
 				$script_path = str_replace(array( '></script>', '<script src=', '"' ), '', $script);
 				$all_scripts[trim($script_path)] = '<script>';
-				//$all_scripts[trim($script_path)] .= Minify_JS_ClosureCompiler::minify(file_get_contents(APP_PATH . '/' . trim($script_path)));
-				$all_scripts[trim($script_path)] .= file_get_contents(APP_PATH . '/' . trim($script_path));
+				$all_scripts[trim($script_path)] .= Minify_JS_ClosureCompiler::minify(file_get_contents(APP_PATH . '/' . trim($script_path)));
+				//$all_scripts[trim($script_path)] .= file_get_contents(APP_PATH . '/' . trim($script_path));
 				$all_scripts[trim($script_path)] .= '</script>';
 				$file_content = str_replace($script, '<?php global $assets; echo stripslashes($assets["js"]["' . trim($script_path) . '"]); ?>', $file_content);
 			}
@@ -67,7 +67,6 @@ function get_content( $file, $content = '', $include_path = null )
 			foreach ( $styles[0] as $style ) {
 				$style_path = str_replace(array( '/>', '<link rel="stylesheet" href=', '"' ), '', $style);
 				$all_styles[trim($style_path)] = '<style>';
-				//$all_styles[trim($style_path)] .= Minify_CSS_Compressor::process(file_get_contents(APP_PATH . '/' . trim($style_path)));
 				$all_styles[trim($style_path)] .= preg_replace('/(\\n|\\t|\\s)/', '', file_get_contents(APP_PATH . '/' . trim($style_path)));
 				$all_styles[trim($style_path)] .= '</style>';
 				$file_content = str_replace($style, '<?php global $assets; echo stripslashes($assets["css"]["' . trim($style_path) . '"]); ?>', $file_content);
@@ -90,6 +89,8 @@ function get_content( $file, $content = '', $include_path = null )
 
 	$content = preg_replace('@\\s*/\\*([\\s\\S]*?)\\*/\\s*@', '' . "\n", $content);
 	$content = preg_replace('/<!--(.*?)-->/', '', $content);
+	$content = preg_replace('/(\/\/([^\'\"])+?)$/m', '', $content);
+	$content = preg_replace('/(\\s+?)$/m', '', $content);
 	return $content;
 }
 
