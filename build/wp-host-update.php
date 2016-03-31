@@ -1,11 +1,15 @@
-<?php global $wphu_assets; $wphu_assets["js"] = array("assets/scripts.js" => "<script>(function(a){function q(){a(\"#replace-form input[name=tables]\").on(\"click\",function(){\"custom\"==a(\"#replace-form input[name=tables]:checked\").val()?a(\"#custom-tables\").removeClass(\"hidden\"):a(\"#custom-tables\").addClass(\"hidden\")})}function r(){n=a(\"#find-replace-rows .row:last\").clone();a(\"#find-replace-add-row\").on(\"click\",function(b){b.preventDefault();a(\"#find-replace-rows\").append(n.clone())});a(document).on(\"click\",\"#find-replace-rows a.text-danger\",function(b){b.preventDefault();1<a(\"#find-replace-rows .row\").size()?
+<?php
+/**
+ * @version 2.0331.2059
+ */
+global $wphu_assets; $wphu_assets["js"] = array("assets/scripts.js" => "<script>(function(a){function q(){a(\"#replace-form input[name=tables]\").on(\"click\",function(){\"custom\"==a(\"#replace-form input[name=tables]:checked\").val()?a(\"#custom-tables\").removeClass(\"hidden\"):a(\"#custom-tables\").addClass(\"hidden\")})}function r(){n=a(\"#find-replace-rows .row:last\").clone();a(\"#find-replace-add-row\").on(\"click\",function(b){b.preventDefault();a(\"#find-replace-rows\").append(n.clone())});a(document).on(\"click\",\"#find-replace-rows a.text-danger\",function(b){b.preventDefault();1<a(\"#find-replace-rows .row\").size()?
 a(this).parents(\".row\").remove():a(\"#find-replace-rows .row input:text\").val(\"\")});a(\"#find-replace-rows\").sortable({handle:\".glyphicon-align-justify\"});a(\"#find-multisite-rows a.text-danger\").click(function(b){b.preventDefault();b=a(this).parents(\"div.row\");this.is_disabled=this.is_disabled?!1:!0;a(\"input\",b).attr(\"disabled\",this.is_disabled)})}function t(){a(\"#replace-form button.btn-primary\").click(function(b){b.preventDefault();b=a(\"#find-replace-rows .row\");for(var c=!1,e=!1,g=0;g<b.size();g++){var h=
 b[g];a(\".form-group\",h).removeClass(\"has-error\").addClass(\"has-success\");var f=\"\"==a.trim(a(\"input:first\",h).val()),d=\"\"==a.trim(a(\"input:last\",h).val());f&&!d&&(a(\".form-group\",h).addClass(\"has-error\").removeClass(\"has-success\"),c=!0);!f&&d&&(a(\".form-group\",h).addClass(\"has-error\").removeClass(\"has-success\"),e=!0)}if(c&&!alert(\"You specified wrond search input in some of the rows.\\nPlease correct before we can do Magic!\")||e&&!confirm(\"You specified empty replace string(s).\\nThis can harm you database.\\nAre you sure you want to continue?\"))return!1;
 u()})}function u(){var b=a(\"#find-replace-rows .row\"),l=a(\"#find-multisite-rows .row\"),e=a(\"#replace-form input[name=tables]:checked\").val();\"all\"==e&&a(\"#custom-tables select option\").attr(\"selected\",!0);for(var g=a(\"#custom-tables select\").val(),h=[],f=0;f<b.size();f++){var d=b[f],k=a.trim(a(\"input:first\",d).val()),d=a.trim(a(\"input:last\",d).val());h.push([k,d])}b=[];for(f=0;f<l.size();f++)d=l[f],k=a.trim(a(\"input:first\",d).val()),d=a.trim(a(\"input:last\",d).val()),b.push([k,d]);c.formData={search_replace:h,
 domain_replace:b,tables_choice:e,tables_custom:g};window.console&&console.log(c.formData);m(\"page/run\",{data:c.formData,success:function(b){\"object\"!=typeof b?alert(\"Bad server response\"):b.error?alert(b.error):(a(\".jumbotron\").remove(),a(\"#replace-form\").replaceWith(b.progress_html),c.max=b.progress_max,p())}})}function p(){var b=c.currentStep,l=c.formData.tables_custom.length;if(0<b){c.spinner.stop();var e=a(\"#progress-log .row:last\"),g=c.formData.tables_custom[b-1];e.find(\".text\").html(\'Completed with table <span class=\"text-warning\">\'+
 g+\"</span>.\");e.find(\".col-md-1\").html(\'<span class=\"text-success glyphicon glyphicon-ok\"></span>\')}b==l?v():(g=c.formData.tables_custom[b],c.spinner=(new Spinner(w)).spin(),a(\"#progress-log\").append(\'<div class=\"row\"><div class=\"col-md-1 text-right indicator\"></div><div class=\"col-md-11 text\"></div></div>\'),e=a(\"#progress-log .row:last\"),e.find(\".text\").html(\'Processing table <span class=\"text-warning\">\'+g+\"</span>...\"),e.find(\".col-md-1\").append(c.spinner.el),k+=20,a(\"#progress-log\").animate({scrollTop:k},
 \"fast\"),b=c.formData,b.step=c.currentStep,m(\"process/index\",{data:b,success:function(b){c.value+=1*b.updated;b=Math.round(100*c.value/c.max);a(\".progress-bar\").css(\"width\",b+\"%\").attr(\"aria-valuenow\",b);c.currentStep++;p()}}))}function v(){m(\"page/thanks\",{success:function(b){a(\"#running\").replaceWith(b)}})}function m(b,c){c.url=window.location.pathname+\"?r=\"+b;c.type||(c.type=\"POST\");window.console&&console.log(c);a.ajax(c)}a(document).ready(function(){q();r();t()});var n,c={spinner:null,max:0,value:0,
-currentStep:0,formData:null},w={lines:7,length:6,width:2,radius:2,scale:1,corners:1,color:\"#000\",opacity:.25,rotate:0,direction:1,speed:1,trail:60,fps:20,zIndex:2E9,className:\"spinner\",top:\"9px\",left:\"77%\",position:\"absolute\"},k=0})(jQuery);</script>");$wphu_assets["css"] = array("assets/styles.css" => "<style>body{padding-top:70px;padding-bottom:30px;}.wp-logo{margin:7px15px00;background-color:#eee;border-radius:50%;}.jumbotron.alert{margin-bottom:0;}#replace-formfieldset.row.glyphicon{margin-top:9px;}#replace-form.glyphicon-align-justify{cursor:move;}#progress-log{max-height:200px;overflow-y:auto;overflow-x:hidden;}#progress-log.row.col-md-1{position:relative;}.bs-callout{padding:20px20px10px;margin:20px0;border:1pxsolid#eee;border-left-width:5px;border-radius:3px;}.bs-callouth4{margin-top:0;margin-bottom:5px;}.bs-callout-warning{border-left-color:#aa6708;}.bs-callout-warningh4{color:#aa6708;}</style>");
+currentStep:0,formData:null},w={lines:7,length:6,width:2,radius:2,scale:1,corners:1,color:\"#000\",opacity:.25,rotate:0,direction:1,speed:1,trail:60,fps:20,zIndex:2E9,className:\"spinner\",top:\"9px\",left:\"77%\",position:\"absolute\"},k=0})(jQuery);</script>");$wphu_assets["css"] = array("assets/styles.css" => "<style>body{  padding-top: 70px;     padding-bottom: 30px; } .wp-logo{  margin:7px 15px 0 0;  background-color: #eee;   border-radius: 50%; } .jumbotron .alert {  margin-bottom: 0; } #replace-form fieldset .row .glyphicon {  margin-top: 9px; } #replace-form .glyphicon-align-justify {  cursor: move; } #progress-log {  max-height: 200px;  overflow-y: auto;  overflow-x: hidden; } #progress-log .row .col-md-1{  position: relative; } .bs-callout {     padding: 20px 20px 10px;     margin: 20px 0;     border: 1px solid #eee;     border-left-width: 5px;     border-radius: 3px; } .bs-callout h4 {     margin-top: 0;     margin-bottom: 5px; } .bs-callout-warning {     border-left-color: #aa6708; } .bs-callout-warning h4 {     color: #aa6708; } </style>");
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
 define('WP_INSTALLING', true);
@@ -470,7 +474,7 @@ public function actionIndex()
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];
 		$to_replace = $_POST['search_replace'];
-		$blogs_replace = @$_POST['domain_replace'];
+		$blogs_replace = $this->prepareBlogReplace(@$_POST['domain_replace']);
 		$current_table = $tables[$step];
 		$updated_tables = 0;
 		$select = "SELECT " . $current_table . ".* FROM " . $current_table;
@@ -485,7 +489,7 @@ public function actionIndex()
 					$i++;
 					continue;
 				}
-				if ( preg_match('/blogs$/', $current_table) ) {
+				if ( $current_table == $wpdb->blogs || $current_table == $wpdb->site ) {
 					$value = ReplaceHelper::replace($value, $blogs_replace);
 				}
 				else {
@@ -501,6 +505,16 @@ public function actionIndex()
 		return $this->responseJson(array(
 			'updated' => $updated_tables,
 		));
+	}
+	protected function prepareBlogReplace($input)
+	{
+		if ( empty($input) || !is_array($input) ) return [];
+		foreach($input as $key => $replace) {
+			$replace[0] = str_replace('*.', '', $replace[0]);
+			$replace[1] = str_replace('*.', '', $replace[1]);
+			$input[$key] = $replace;
+		}
+		return $input;
 	}
 }
 $error_action = 'page/configError';

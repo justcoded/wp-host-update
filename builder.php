@@ -63,7 +63,7 @@ function get_content( $file, $content = '', $include_path = null )
 			foreach ( $styles[0] as $style ) {
 				$style_path = str_replace(array( '/>', '<link rel="stylesheet" href=', '"' ), '', $style);
 				$all_styles[trim($style_path)] = '<style>';
-				$all_styles[trim($style_path)] .= preg_replace('/(\\n|\\t|\\s)/', '', file_get_contents(APP_PATH . '/' . trim($style_path)));
+				$all_styles[trim($style_path)] .= preg_replace('/(\\n|\\t|\\s)/', ' ', file_get_contents(APP_PATH . '/' . trim($style_path)));
 				$all_styles[trim($style_path)] .= '</style>';
 				$file_content = str_replace($style, '<?php global $wphu_assets; echo stripslashes($wphu_assets["css"]["' . trim($style_path) . '"]); ?>', $file_content);
 			}
@@ -99,7 +99,12 @@ function change_path( $path )
 }
 
 $builder_content = get_content( APP_PATH . '/index.php' );
-$builder = '<?php global $wphu_assets; $wphu_assets["js"] = array(';
+$version = (date('Y') - 2014) . date('.md.Hi');
+$builder = '<?php
+/**
+ * @version ' . $version . '
+ */
+global $wphu_assets; $wphu_assets["js"] = array(';
 
 foreach ( $all_scripts as $key => $script ) {
 	$builder .= '"' . addslashes($key) . '" => "' . addslashes($script) .'"';
