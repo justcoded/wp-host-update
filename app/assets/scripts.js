@@ -123,6 +123,7 @@
   function process_findreplace_form_submit() {
     // collect values
     var replace_rows = $('#find-replace-rows .row');
+    var domain_rows = $('#find-multisite-rows .row');
     var tables_choice = $('#replace-form input[name=tables]:checked').val();
       // autoselect options if "all" selected
       if ( tables_choice == 'all' ) {
@@ -138,9 +139,18 @@
 
       search_replace.push( [search, replace] );
     }
+    var domain_replace = [];
+    for ( var i=0; i < domain_rows.size(); i++ ) {
+      var row = domain_rows[i];
+      var search = $.trim($('input:first', row).val());
+      var replace = $.trim($('input:last', row).val());
+
+      domain_replace.push( [search, replace] );
+    }
 
     progressBar.formData = {
       search_replace: search_replace,
+      domain_replace: domain_replace,
       tables_choice: tables_choice,
       tables_custom: tables_custom
     };
@@ -189,7 +199,8 @@
     , left: '77%' // Left position relative to parent
     , position: 'absolute' // Element positioning    
     };
-    
+  
+  var progress_scroll = 0;
   /**
    * run ajax for each table in request, update progress bar
    */
@@ -221,15 +232,16 @@
     var log = $('#progress-log .row:last');
     log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
     log.find('.col-md-1').append(progressBar.spinner.el);
-    
+    progress_scroll += 20;
+    $('#progress-log').animate({scrollTop:progress_scroll}, 'fast');
+
     var data = progressBar.formData;
     data.step = progressBar.currentStep;
     ajax_request( 'process/index', {
       data:data,
       success: function(resp) {
         // TODO: validate response
-        
-        progressBar.value += resp.updated
+        progressBar.value += resp.updated * 1;
         update_progress_bar();
         
         progressBar.currentStep++;

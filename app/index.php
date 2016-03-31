@@ -9,10 +9,10 @@
 
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
-
-define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../demo-latest/wp-config.php');
+define( 'WP_INSTALLING', true );
+define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../mswp/wp-config.php');
 // test mode:
-define('ABSPATH', dirname(__FILE__) . '/../../demo-latest/cms/');
+define('ABSPATH', dirname(__FILE__) . '/../../mswp/');
 
 include APP_PATH . '/inc/functions.php';
 include APP_PATH . '/components/Router.php';
@@ -32,5 +32,5 @@ if ( ! is_file(WP_CONFIG_PATH) ) {
 	}
 }
 
-\WpHUp\components\Router::callAction();
+Router::callAction();
 exit;

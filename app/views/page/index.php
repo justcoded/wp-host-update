@@ -51,7 +51,7 @@ include VIEWS_PATH . '/layouts/header.php';
 				<div class="col-md-4">
 					<div class="form-group"><input type="text" class="form-control" name="replace[]" 
 												   placeholder="<?php echo html_encode($params[2]); ?>" 
-												   value="<?php echo html_encode($params[3]); ?>"></div>
+												   value="<?php echo html_encode(preg_replace('/\?.*/', '', $params[3])); ?>"></div>
 				</div>
 				<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
 			</div>
@@ -64,7 +64,43 @@ include VIEWS_PATH . '/layouts/header.php';
 				<button id="find-replace-add-row" class="btn">Add Row</button>
 			</div>
 		</div>
-		
+
+		<?php if ( MULTISITE ) : ?>
+			<!-- find replace block -->
+			<div class="page-header">
+				<h2>Multisite configuration</h2>
+			</div>
+
+			<div class="row form-header">
+				<div class="col-md-1"></div>
+				<div class="col-md-4">
+					<h4>Old Domain</h4>
+				</div>
+				<div class="col-md-1"></div>
+				<div class="col-md-4">
+					<h4>New Domain</h4>
+				</div>
+				<div class="col-md-1"></div>
+			</div>
+			<fieldset id="find-multisite-rows">
+				<div class="row">
+					<div class="col-md-1 text-right"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></div>
+					<div class="col-md-4">
+						<div class="form-group"><input type="text" class="form-control" name="old_domain[]" 
+													   placeholder="<?php echo 'Old domain'; ?>" 
+													   value="<?php echo html_encode($domain_replace['old_domain']); ?>"></div>
+					</div>
+					<div class="col-md-1 text-center"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span></div>
+					<div class="col-md-4">
+						<div class="form-group"><input type="text" class="form-control" name="new_domain[]" 
+													   placeholder="<?php echo 'New domain'; ?>" 
+													   value="<?php echo html_encode($domain_replace['new_domain']); ?>"></div>
+					</div>
+					<div class="col-md-1"><a href="#" class="text-danger" title="Delete"><span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></a></div>
+				</div>
+			</fieldset>
+		<?php endif; ?>	
+
 		<!-- Advanced options -->
 		<div class="page-header">
 			<h2>Advanced options</h2>
@@ -74,7 +110,7 @@ include VIEWS_PATH . '/layouts/header.php';
 			<div class="radio">
 				<label>
 					<input type="radio" name="tables" value="all" checked>
-					Replace all tables with prefix "wp_" <span class="text-danger">TODO: use prefix from wp-config and filter tables list with this prefix</span>
+					Replace all tables with prefix "<?php echo $this->wpdb->prefix;?>" <span class="text-danger"> Use prefix from wp-config and filter tables list with this prefix</span>
 				</label>
 			  </div>
 			<div class="radio">
