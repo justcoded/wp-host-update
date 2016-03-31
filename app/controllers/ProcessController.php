@@ -25,6 +25,8 @@ class ProcessController extends BaseController
 		global $wpdb;
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];
+		$to_replace = $_POST['search_replace'];
+		$blogs_replace = $this->prepareBlogReplace(@$_POST['domain_replace']);
 		$current_table = $tables[$step];
 		$updated_tables = 0;
 
@@ -43,14 +45,14 @@ class ProcessController extends BaseController
 					continue;
 				}
 
-				if ( strpos($current_table, 'blogs') ) {
-					$value = $this->applyReplaces($value, true);
+				if ( $current_table == $wpdb->blogs || $current_table == $wpdb->site ) {
+					$value = ReplaceHelper::replace($value, $blogs_replace);
 				}
 				else {
-					$value = $this->recursiveReplace($value);
+					$value = ReplaceHelper::recursiveReplace($value, $to_replace);
 				}
 
-				$update_values[] =  $key . "='" . $this->sqlAddslashes($value) . "'";
+				$update_values[] =  $key . "='" . sql_add_slashes($value) . "'";
 				$i++;
 			}
 			$update .= implode(',', $update_values);
@@ -61,109 +63,16 @@ class ProcessController extends BaseController
 			'updated' => $updated_tables,
 		));
 	}
-
-	/**
-	 * Recursive replace values
-	 * @param string|array $data
-	 * @param boolean $serialized
-	 * @param boolean $parent_serialized
-	 * @return string
-	 */
-	public function recursiveReplace( $data, $serialized = false, $parent_serialized = false )
+	
+	protected function prepareBlogReplace($input)
 	{
-		$is_json = false;
-		if ( is_string($data) && ( $unserialized = unserialize($data) ) !== false ) {
-			// PHP currently has a bug that doesn't allow you to clone the DateInterval / DatePeriod classes.
-			// We skip them here as they probably won't need data to be replaced anyway
-			if ( is_object($unserialized) && ( $unserialized instanceof DateInterval || $unserialized instanceof DatePeriod ) ) {
-				return $data;
-			}
-			$data = $this->recursiveReplace($unserialized, true, true);
+		if ( empty($input) || !is_array($input) ) return [];
+		foreach($input as $key => $replace) {
+			$replace[0] = str_replace('*.', '', $replace[0]);
+			$replace[1] = str_replace('*.', '', $replace[1]);
+			$input[$key] = $replace;
 		}
-		elseif ( is_array($data) ) {
-			$_tmp = array();
-
-			foreach ( $data as $key => $value ) {
-				$_tmp[$key] = $this->recursiveReplace($value, false, $parent_serialized);
-			}
-			$data = $_tmp;
-			unset($_tmp);
-		}
-		// Submitted by Tina Matter
-		elseif ( is_object($data) ) {
-			$_tmp = clone $data;
-
-			foreach ( $data as $key => $value ) {
-				$_tmp->$key = $this->recursiveReplace($value, false, $parent_serialized);
-			}
-			$data = $_tmp;
-			unset($_tmp);
-		}
-		elseif ( $this->isJson($data, true) ) {
-			$_tmp = array();
-			$data = json_decode($data, true);
-
-			foreach ( $data as $key => $value ) {
-				$_tmp[$key] = $this->recursiveReplace($value, false, $parent_serialized);
-			}
-			$data = $_tmp;
-			unset($_tmp);
-			$is_json = true;
-		}
-		elseif ( is_string($data) ) {
-			$data = $this->applyReplaces($data);
-		}
-
-		if ( $serialized )
-			return serialize($data);
-
-		if ( $is_json )
-			return json_encode($data);
-
-		return $data;
+		return $input;
 	}
-
-	/**
-	 * Apply replace
-	 * @param string $subject
-	 * @param boolean $is_serialized
-	 * @return boolean
-	 */
-	public function applyReplaces( $subject, $is_blogs = false )
-	{
-		$search = !empty($is_blogs) ? $_POST['domain_replace'] : $_POST['search_replace'];
-
-		foreach ( $search as $replace ) {
-			$subject = str_ireplace($replace[0], $replace[1], $subject);
-		}
-		return $subject;
-	}
-
-	/**
-	 * 
-	 * @param string $string
-	 * @param boolean $strict
-	 * @return boolean
-	 */
-	public function isJson( $string, $strict = false )
-	{
-		$json = @json_decode($string, true);
-
-		if ( $strict == true && !is_array($json) )
-			return false;
-
-		return !( $json == NULL || $json == false );
-	}
-
-	/**
-	 * Better addslashes for SQL queries.
-	 * Taken from phpMyAdmin.
-	 */
-	public function sqlAddslashes( $string = '' )
-	{
-		$string = str_replace('\\', '\\\\', $string);
-		return str_replace('\'', '\\\'', $string);
-	}
-
 }
 

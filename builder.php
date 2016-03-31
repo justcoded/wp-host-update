@@ -8,14 +8,11 @@ define('APP_PATH', ROOT_DIR . '/app');
 define('BUILD_DIR', ROOT_DIR . '/build');
 define('VIEWS_PATH', APP_PATH . '/views');
 
-include(ROOT_DIR . '/minify/css/Compressor.php');
 include(ROOT_DIR . '/minify/js/ClosureCompiler.php');
 
 // print helper function
 if ( !function_exists('pa') ) :
-
-	function pa( $mixed, $stop = false )
-	{
+	function pa( $mixed, $stop = false ) {
 		$ar = debug_backtrace();
 		$key = pathinfo($ar[0]['file']);
 		$key = $key['basename'] . ':' . $ar[0]['line'];
@@ -24,20 +21,19 @@ if ( !function_exists('pa') ) :
 		if ( $stop == 1 )
 			exit();
 	}
-
 endif;
 
 function get_content( $file, $content = '', $include_path = null )
 {
 	global $all_scripts;
 	global $all_styles;
-	$pattern = '/include [a-zA-Z\.\/\_\'\- ]*;/';
+	$include_pattern = '/include [a-zA-Z\.\/\_\'\- ]*;/';
 	$views_pattern = '/include( *)VIEWS_PATH[a-zA-Z\.\/\_\'\- ]*;/';
 	$script_pattern = '/<script src="[a-zA-Z\.\/\_\'\-]*"><\/script>/';
 	$style_pattern = '/<link rel="stylesheet" href="[a-zA-Z\.\/\_\'\-]*"(.*?)\/>/';
 
 	$file_content = file_get_contents($file);
-	preg_match_all($pattern, $file_content, $includes);
+	preg_match_all($include_pattern, $file_content, $includes);
 
 	if ( !empty($content) ) {
 		
@@ -59,7 +55,7 @@ function get_content( $file, $content = '', $include_path = null )
 				$all_scripts[trim($script_path)] .= Minify_JS_ClosureCompiler::minify(file_get_contents(APP_PATH . '/' . trim($script_path)));
 				//$all_scripts[trim($script_path)] .= file_get_contents(APP_PATH . '/' . trim($script_path));
 				$all_scripts[trim($script_path)] .= '</script>';
-				$file_content = str_replace($script, '<?php global $assets; echo stripslashes($assets["js"]["' . trim($script_path) . '"]); ?>', $file_content);
+				$file_content = str_replace($script, '<?php global $wphu_assets; echo stripslashes($wphu_assets["js"]["' . trim($script_path) . '"]); ?>', $file_content);
 			}
 		}
 
@@ -69,7 +65,7 @@ function get_content( $file, $content = '', $include_path = null )
 				$all_styles[trim($style_path)] = '<style>';
 				$all_styles[trim($style_path)] .= preg_replace('/(\\n|\\t|\\s)/', '', file_get_contents(APP_PATH . '/' . trim($style_path)));
 				$all_styles[trim($style_path)] .= '</style>';
-				$file_content = str_replace($style, '<?php global $assets; echo stripslashes($assets["css"]["' . trim($style_path) . '"]); ?>', $file_content);
+				$file_content = str_replace($style, '<?php global $wphu_assets; echo stripslashes($wphu_assets["css"]["' . trim($style_path) . '"]); ?>', $file_content);
 			}
 		}
 	}
@@ -103,17 +99,22 @@ function change_path( $path )
 }
 
 $builder_content = get_content( APP_PATH . '/index.php' );
-$builder = '<?php global $assets; $assets["js"] = array(';
+$builder = '<?php global $wphu_assets; $wphu_assets["js"] = array(';
 
 foreach ( $all_scripts as $key => $script ) {
 	$builder .= '"' . addslashes($key) . '" => "' . addslashes($script) .'"';
 }
 $builder .= ');';
-$builder .= '$assets["css"] = array(';
+$builder .= '$wphu_assets["css"] = array(';
 
 foreach ( $all_styles as $key => $style ) {
 	$builder .= '"' . addslashes($key) . '" => "' . addslashes($style) .'"';
 }
 $builder .= ');';
 $builder .= $builder_content . '?>';
-file_put_contents(BUILD_DIR . '/wp-host-update.php', $builder);
+if ( file_put_contents(BUILD_DIR . '/wp-host-update.php', $builder) ) {
+	echo 'Host update script generated. Please see ./build/wp-host-update.php';
+}
+else {
+	echo "Script building failed!";
+}

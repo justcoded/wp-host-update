@@ -66,6 +66,16 @@
     $( "#find-replace-rows" ).sortable({
       handle: ".glyphicon-align-justify"
     });
+    
+    // init disable of domains check
+    $('#find-multisite-rows a.text-danger').click(function(e){
+      e.preventDefault();
+      
+      var row = $(this).parents('div.row');
+      if ( !this.is_disabled ) this.is_disabled = true;
+      else this.is_disabled = false;
+      $('input', row).attr('disabled', this.is_disabled);
+    });
   }
   
   /**

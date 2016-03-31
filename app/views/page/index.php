@@ -84,7 +84,7 @@ include VIEWS_PATH . '/layouts/header.php';
 			</div>
 			<fieldset id="find-multisite-rows">
 				<div class="row">
-					<div class="col-md-1 text-right"><span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span></div>
+					<div class="col-md-1 text-right"><span class="glyphicon glyphicon-cloud" aria-hidden="true"></span></div>
 					<div class="col-md-4">
 						<div class="form-group"><input type="text" class="form-control" name="old_domain[]" 
 													   placeholder="<?php echo 'Old domain'; ?>" 
@@ -110,7 +110,7 @@ include VIEWS_PATH . '/layouts/header.php';
 			<div class="radio">
 				<label>
 					<input type="radio" name="tables" value="all" checked>
-					Replace all tables with prefix "<?php echo $this->wpdb->prefix;?>" <span class="text-danger"> Use prefix from wp-config and filter tables list with this prefix</span>
+					Replace all tables with prefix "<?php echo html_encode($this->wpdb->prefix); ?>"
 				</label>
 			  </div>
 			<div class="radio">
