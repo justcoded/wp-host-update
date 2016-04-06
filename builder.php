@@ -103,6 +103,8 @@ $version = (date('Y') - 2014) . date('.md.Hi');
 $builder = '<?php
 /**
  * @version ' . $version . '
+ * @author JustCoded
+ * @see https://bitbucket.org/justcoded/tools_wp_host_update 
  */
 global $wphu_assets; $wphu_assets["js"] = array(';
 

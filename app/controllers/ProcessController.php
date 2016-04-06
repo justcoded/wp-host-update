@@ -66,7 +66,7 @@ class ProcessController extends BaseController
 	
 	protected function prepareBlogReplace($input)
 	{
-		if ( empty($input) || !is_array($input) ) return [];
+		if ( empty($input) || !is_array($input) ) return array();
 		foreach($input as $key => $replace) {
 			$replace[0] = str_replace('*.', '', $replace[0]);
 			$replace[1] = str_replace('*.', '', $replace[1]);
