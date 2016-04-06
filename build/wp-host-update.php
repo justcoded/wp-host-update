@@ -1,6 +1,8 @@
 <?php
 /**
- * @version 2.0331.2059
+ * @version 2.0406.1600
+ * @author JustCoded
+ * @see https://bitbucket.org/justcoded/tools_wp_host_update 
  */
 global $wphu_assets; $wphu_assets["js"] = array("assets/scripts.js" => "<script>(function(a){function q(){a(\"#replace-form input[name=tables]\").on(\"click\",function(){\"custom\"==a(\"#replace-form input[name=tables]:checked\").val()?a(\"#custom-tables\").removeClass(\"hidden\"):a(\"#custom-tables\").addClass(\"hidden\")})}function r(){n=a(\"#find-replace-rows .row:last\").clone();a(\"#find-replace-add-row\").on(\"click\",function(b){b.preventDefault();a(\"#find-replace-rows\").append(n.clone())});a(document).on(\"click\",\"#find-replace-rows a.text-danger\",function(b){b.preventDefault();1<a(\"#find-replace-rows .row\").size()?
 a(this).parents(\".row\").remove():a(\"#find-replace-rows .row input:text\").val(\"\")});a(\"#find-replace-rows\").sortable({handle:\".glyphicon-align-justify\"});a(\"#find-multisite-rows a.text-danger\").click(function(b){b.preventDefault();b=a(this).parents(\"div.row\");this.is_disabled=this.is_disabled?!1:!0;a(\"input\",b).attr(\"disabled\",this.is_disabled)})}function t(){a(\"#replace-form button.btn-primary\").click(function(b){b.preventDefault();b=a(\"#find-replace-rows .row\");for(var c=!1,e=!1,g=0;g<b.size();g++){var h=
@@ -508,7 +510,7 @@ public function actionIndex()
 	}
 	protected function prepareBlogReplace($input)
 	{
-		if ( empty($input) || !is_array($input) ) return [];
+		if ( empty($input) || !is_array($input) ) return array();
 		foreach($input as $key => $replace) {
 			$replace[0] = str_replace('*.', '', $replace[0]);
 			$replace[1] = str_replace('*.', '', $replace[1]);

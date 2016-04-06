@@ -13,8 +13,8 @@ define('WP_INSTALLING', true);
 include APP_PATH . '/inc/functions.php';
 
 // test location for wp config
-#define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../demo-latest/wp-config.php');
-define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../../wp-ms-wildcard/wp-config.php');
+define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../demo-latest/wp-config.php');
+#define('WP_CONFIG_PATH', dirname(__FILE__) . '/../../../wp-ms-wildcard/wp-config.php');
 define('ABSPATH', find_wp_abspath() );
 
 include APP_PATH . '/components/Router.php';
