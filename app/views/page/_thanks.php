@@ -8,6 +8,8 @@
 	<div class="bs-callout bs-callout-warning">
 		<h4>Having problems?</h4>
 		<p>If you have problems with our script or have any suggestions, please write to us at our public repository:</p> 
-		<p class="text-primary"><a href="https://bitbucket.org/justcoded/tools_wp_host_update/issues?status=new&status=open" target="_blank">http://bitbucket.org/justcoded/tools_wp_host_update</a></p>
+		<p class="text-primary">
+			<a href="https://github.com/justcoded/wp-host-update/issues" target="_blank"><?php echo htmlentities('https://github.com/justcoded/wp-host-update/issues', ENT_QUOTES, 'UTF-8'); ?></a>
+		</p>
 	</div>
 </section>

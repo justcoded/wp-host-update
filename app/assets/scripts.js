@@ -5,8 +5,8 @@
     init_form_tables_switch();
     init_form_findreplace_rows();
     init_form_processing();
-  })
-  
+  });
+
   /**
    * Safe print helper
    * @param mixed mixed
@@ -41,7 +41,7 @@
    */
   function init_form_findreplace_rows() {
     rowClone = $('#find-replace-rows .row:last').clone();
-    
+
     // add row event
     $('#find-replace-add-row').on('click', function(e){
       e.preventDefault();
@@ -150,10 +150,10 @@
       search_replace.push( [search, replace] );
     }
     var domain_replace = [];
-    for ( var i=0; i < domain_rows.size(); i++ ) {
-      var row = domain_rows[i];
-      var search = $.trim($('input:first', row).val());
-      var replace = $.trim($('input:last', row).val());
+    for ( i=0; i < domain_rows.size(); i++ ) {
+      row = domain_rows[i];
+      search = $.trim($('input:first', row).val());
+      replace = $.trim($('input:last', row).val());
 
       domain_replace.push( [search, replace] );
     }
@@ -215,6 +215,7 @@
    * run ajax for each table in request, update progress bar
    */
   function process_tables_one_by_one() {
+    var log, wp_table;
     var step = progressBar.currentStep;
     var lastStep = progressBar.formData.tables_custom.length;
     
@@ -222,8 +223,8 @@
     if ( step > 0 ) {
       progressBar.spinner.stop();
       
-      var log = $('#progress-log .row:last');
-      var wp_table = progressBar.formData.tables_custom[step-1];
+      log = $('#progress-log .row:last');
+      wp_table = progressBar.formData.tables_custom[step-1];
       log.find('.text').html('Completed with table <span class="text-warning">' + wp_table + '</span>.');
       log.find('.col-md-1').html('<span class="text-success glyphicon glyphicon-ok"></span>');
     }
@@ -234,12 +235,12 @@
     }
     
     // insert new log row
-    var wp_table = progressBar.formData.tables_custom[step];
+    wp_table = progressBar.formData.tables_custom[step];
     progressBar.spinner = new Spinner(spinnerOpts).spin();
 
     $('#progress-log').append( '<div class="row"><div class="col-md-1 text-right indicator"></div><div class="col-md-11 text"></div></div>' );
     
-    var log = $('#progress-log .row:last');
+    log = $('#progress-log .row:last');
     log.find('.text').html('Processing table <span class="text-warning">' + wp_table + '</span>...');
     log.find('.col-md-1').append(progressBar.spinner.el);
     progress_scroll += 20;
@@ -276,8 +277,8 @@
   /**
    * call ajax request
    * 
-   * @param string action  controller/action string
-   * @param object params  ajax params
+   * @param action string    controller/action string
+   * @param params object    ajax params
    */
   function ajax_request(action, params) {
     var basePath = window.location.pathname;

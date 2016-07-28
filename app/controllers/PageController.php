@@ -21,11 +21,11 @@ class PageController extends BaseController
 
 		// define new options to suggest
 		$new_options = array(
-			'home' => '//'.$_SERVER['HTTP_HOST'],
+			'home' => '//' . trim($_SERVER['HTTP_HOST'], '/'),
 			'wpcontent_path' => WP_CONTENT_DIR,
-			'basepath' => '/'.trim(str_replace(basename(__FILE__), '', $_SERVER['REQUEST_URI']), '/'),
+			'basepath' => '/' . trim(str_replace(basename(__FILE__), '', $_SERVER['REQUEST_URI']), '/'),
 		);
-		$new_options['home'] .= $new_options['basepath'];
+		$new_options['home'] = rtrim($new_options['home'] . $new_options['basepath'], '/');
 
 		// prepare an array for view
 		$default_search_replace = array(
