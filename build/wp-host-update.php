@@ -1,6 +1,6 @@
 <?php
 /**
- * @version 2.0728.1618
+ * @version 2.1201.1611
  * @author JustCoded
  * @see https://bitbucket.org/justcoded/tools_wp_host_update 
  */
@@ -474,6 +474,7 @@ class ProcessController extends BaseController
 {
 public function actionIndex()
 	{
+		set_time_limit(0);
 		global $wpdb;
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];

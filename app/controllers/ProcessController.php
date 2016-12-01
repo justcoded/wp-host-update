@@ -22,6 +22,8 @@ class ProcessController extends BaseController
 	 */
 	public function actionIndex()
 	{
+		set_time_limit(0);
+
 		global $wpdb;
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];
