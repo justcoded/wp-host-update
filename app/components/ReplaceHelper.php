@@ -7,7 +7,7 @@ class ReplaceHelper
 {
 	/**
 	 * Recursive replace values
-	 * @param string|array $data
+	 * @param string|array|object $data
 	 * @param array   $to_replace   array of (search,replace) pairs
 	 * @param boolean $serialized
 	 * @param boolean $parent_serialized

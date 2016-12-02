@@ -105,29 +105,49 @@ include VIEWS_PATH . '/layouts/header.php';
 		<div class="page-header">
 			<h2>Advanced options</h2>
 		</div>
-		
-		<div class="form-group">
-			<div class="radio">
-				<label>
-					<input type="radio" name="tables" value="all" checked>
-					Replace all tables with prefix "<?php echo html_encode($this->wpdb->prefix); ?>"
-				</label>
-			  </div>
-			<div class="radio">
-				<label>
-					<input type="radio" name="tables" value="custom">
-					Replace only selected tables below
-				</label>
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="form-group">
+					<div class="radio">
+						<label>
+							<input type="radio" name="tables" value="all" checked>
+							Replace all tables with prefix "<?php echo html_encode($this->wpdb->prefix); ?>"
+						</label>
+					  </div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="tables" value="custom">
+							Replace only selected tables below
+						</label>
+					</div>
+				</div>
+				<div class="form-group hidden" id="custom-tables">
+					<label>Tables to search/replace</label>
+					<select multiple class="form-control">
+						<?php echo html_options($tables); ?>
+					</select>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<div class="radio">
+						<label>
+							<input type="radio" name="replace_method" value="simple" checked>
+							Replace only content columns/string data columns
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input type="radio" name="replace_method" value="full">
+							Replace all data columns
+						</label>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="form-group hidden" id="custom-tables">
-			<label>Tables to search/replace</label>
-			<select multiple class="form-control">
-				<?php echo html_options($tables); ?>
-			</select>
-		</div>
 		
-		<!-- Advanced options -->
+		<!-- Submit button -->
 		<div class="page-header">
 			<h2>That's it!</h2>
 		</div>

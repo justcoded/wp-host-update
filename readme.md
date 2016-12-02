@@ -20,3 +20,14 @@ Repository has 2 parts:
 
 1. The script source files inside `/app/` folder. These super simple MVC/OOP scripts which process page requests and views render.
 2. In the root folder you can find `builder.php` file. This one is used to collect all "app" into one single script and compress it a bit to minimize file size.
+
+#### Changelog
+
+* Version 2.1202.*
+  * Added new option to run "light weight" replace. It skips numeric fields and some special fields like dates, meta_keys etc.
+  * Added support for run queries in blocks to prevent memory limit on tables with too many rows
+* Version 2.1201.*
+  * Reset time limit to prevent script to be blocked by timeout
+* Version 2
+  * Convert all fields in all tables.
+  * Simple MVC framework with minimizer/builder.
