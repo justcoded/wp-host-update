@@ -12,9 +12,8 @@
    * @param mixed mixed
    */
   function pa(mixed) {
-    return;
     if ( window.console )
-      console.log(mixed);
+      console.info(mixed);
   }
   
   /**
@@ -125,7 +124,8 @@
     max: 0,
     value: 0,
     currentStep: 0,
-    formData: null
+    formData: null,
+    timer: 0
   };
   
   /**
@@ -233,6 +233,7 @@
     }
 
     if ( step == lastStep ) {
+      pa('Run in: ' + progressBar.timer + ' sec');
       process_completed_page();
       return;
     }
@@ -254,10 +255,18 @@
     ajax_request( 'process/index', {
       data:data,
       success: function(resp) {
-        // TODO: validate response
-        progressBar.value += resp.updated * 1;
-        update_progress_bar();
-        
+        if (typeof resp == 'object') {
+          pa({'table': resp.table, 'rows': resp.found + ' > ' + resp.updated, 'in': resp.in + 's'})
+
+          progressBar.value += resp.found * 1;
+          progressBar.timer += resp.in;
+          update_progress_bar();
+        }
+        else {
+          pa(resp);
+          alert('Update failed for table "' + progressBar.formData.tables_custom[progressBar.currentStep] + '"');
+        }
+
         progressBar.currentStep++;
         process_tables_one_by_one();
       }
@@ -289,7 +298,7 @@
     
     if ( ! params.type ) params.type = 'POST';
     
-    pa(params);
+    //pa(params);
     
     $.ajax(params);
   }
