@@ -12,6 +12,7 @@
    * @param mixed mixed
    */
   function pa(mixed) {
+    return;
     if ( window.console )
       console.log(mixed);
   }
@@ -140,6 +141,7 @@
         $('#custom-tables select option').attr('selected', true);
       }
     var tables_custom = $('#custom-tables select').val();
+    var replace_method = $('#replace-form input[name=replace_method]:checked').val();
 
     var search_replace = [];
     for ( var i=0; i < replace_rows.size(); i++ ) {
@@ -162,7 +164,8 @@
       search_replace: search_replace,
       domain_replace: domain_replace,
       tables_choice: tables_choice,
-      tables_custom: tables_custom
+      tables_custom: tables_custom,
+      replace_method: replace_method
     };
 
     pa(progressBar.formData);
