@@ -1,17 +1,18 @@
 <?php
 /**
- * @version 2.1202.1649
+ * @version 2.1202.1929
  * @author JustCoded
  * @see https://bitbucket.org/justcoded/tools_wp_host_update 
  */
-global $wphu_assets; $wphu_assets["js"] = array("assets/scripts.js" => "<script>(function(a){function t(){a(\"#replace-form input[name=tables]\").on(\"click\",function(){\"custom\"==a(\"#replace-form input[name=tables]:checked\").val()?a(\"#custom-tables\").removeClass(\"hidden\"):a(\"#custom-tables\").addClass(\"hidden\")})}function u(){p=a(\"#find-replace-rows .row:last\").clone();a(\"#find-replace-add-row\").on(\"click\",function(b){b.preventDefault();a(\"#find-replace-rows\").append(p.clone())});a(document).on(\"click\",\"#find-replace-rows a.text-danger\",function(b){b.preventDefault();1<a(\"#find-replace-rows .row\").size()?
-a(this).parents(\".row\").remove():a(\"#find-replace-rows .row input:text\").val(\"\")});a(\"#find-replace-rows\").sortable({handle:\".glyphicon-align-justify\"});a(\"#find-multisite-rows a.text-danger\").click(function(b){b.preventDefault();b=a(this).parents(\"div.row\");this.is_disabled=this.is_disabled?!1:!0;a(\"input\",b).attr(\"disabled\",this.is_disabled)})}function v(){a(\"#replace-form button.btn-primary\").click(function(b){b.preventDefault();b=a(\"#find-replace-rows .row\");for(var c=!1,d=!1,h=0;h<b.size();h++){var k=
-b[h];a(\".form-group\",k).removeClass(\"has-error\").addClass(\"has-success\");var l=\"\"==a.trim(a(\"input:first\",k).val()),e=\"\"==a.trim(a(\"input:last\",k).val());l&&!e&&(a(\".form-group\",k).addClass(\"has-error\").removeClass(\"has-success\"),c=!0);!l&&e&&(a(\".form-group\",k).addClass(\"has-error\").removeClass(\"has-success\"),d=!0)}if(c&&!alert(\"You specified wrond search input in some of the rows.\\nPlease correct before we can do Magic!\")||d&&!confirm(\"You specified empty replace string(s).\\nThis can harm you database.\\nAre you sure you want to continue?\"))return!1;
-w()})}function w(){var b=a(\"#find-replace-rows .row\"),g=a(\"#find-multisite-rows .row\"),d=a(\"#replace-form input[name=tables]:checked\").val();\"all\"==d&&a(\"#custom-tables select option\").attr(\"selected\",!0);for(var h=a(\"#custom-tables select\").val(),k=a(\"#replace-form input[name=replace_method]:checked\").val(),l=[],e=0;e<b.size();e++){var f=b[e],m=a.trim(a(\"input:first\",f).val()),f=a.trim(a(\"input:last\",f).val());l.push([m,f])}b=[];for(e=0;e<g.size();e++)f=g[e],m=a.trim(a(\"input:first\",f).val()),f=
-a.trim(a(\"input:last\",f).val()),b.push([m,f]);c.formData={search_replace:l,domain_replace:b,tables_choice:d,tables_custom:h,replace_method:k};n(\"page/run\",{data:c.formData,success:function(b){\"object\"!=typeof b?alert(\"Bad server response\"):b.error?alert(b.error):(a(\".jumbotron\").remove(),a(\"#replace-form\").replaceWith(b.progress_html),c.max=b.progress_max,q())}})}function q(){var b,g,d=c.currentStep,h=c.formData.tables_custom.length;0<d&&(c.spinner.stop(),b=a(\"#progress-log .row:last\"),g=c.formData.tables_custom[d-
-1],b.find(\".text\").html(\'Completed with table <span class=\"text-warning\">\'+g+\"</span>.\"),b.find(\".col-md-1\").html(\'<span class=\"text-success glyphicon glyphicon-ok\"></span>\'));d==h?x():(g=c.formData.tables_custom[d],c.spinner=(new Spinner(y)).spin(),a(\"#progress-log\").append(\'<div class=\"row\"><div class=\"col-md-1 text-right indicator\"></div><div class=\"col-md-11 text\"></div></div>\'),b=a(\"#progress-log .row:last\"),b.find(\".text\").html(\'Processing table <span class=\"text-warning\">\'+g+\"</span>...\"),
-b.find(\".col-md-1\").append(c.spinner.el),r+=20,a(\"#progress-log\").animate({scrollTop:r},\"fast\"),b=c.formData,b.step=c.currentStep,n(\"process/index\",{data:b,success:function(b){c.value+=1*b.updated;b=Math.round(100*c.value/c.max);a(\".progress-bar\").css(\"width\",b+\"%\").attr(\"aria-valuenow\",b);c.currentStep++;q()}}))}function x(){n(\"page/thanks\",{success:function(b){a(\"#running\").replaceWith(b)}})}function n(b,c){c.url=window.location.pathname+\"?r=\"+b;c.type||(c.type=\"POST\");a.ajax(c)}a(document).ready(function(){t();
-u();v()});var p,c={spinner:null,max:0,value:0,currentStep:0,formData:null},y={lines:7,length:6,width:2,radius:2,scale:1,corners:1,color:\"#000\",opacity:.25,rotate:0,direction:1,speed:1,trail:60,fps:20,zIndex:2E9,className:\"spinner\",top:\"9px\",left:\"77%\",position:\"absolute\"},r=0})(jQuery);</script>");$wphu_assets["css"] = array("assets/styles.css" => "<style>body{  padding-top: 70px;     padding-bottom: 30px; } .wp-logo{  margin:7px 15px 0 0;  background-color: #eee;   border-radius: 50%; } .jumbotron .alert {  margin-bottom: 0; } #replace-form fieldset .row .glyphicon {  margin-top: 9px; } #replace-form .glyphicon-align-justify {  cursor: move; } #progress-log {  max-height: 200px;  overflow-y: auto;  overflow-x: hidden; } #progress-log .row .col-md-1{  position: relative; } .bs-callout {     padding: 20px 20px 10px;     margin: 20px 0;     border: 1px solid #eee;     border-left-width: 5px;     border-radius: 3px; } .bs-callout h4 {     margin-top: 0;     margin-bottom: 5px; } .bs-callout-warning {     border-left-color: #aa6708; } .bs-callout-warning h4 {     color: #aa6708; } </style>");
+global $wphu_assets; $wphu_assets["js"] = array("assets/scripts.js" => "<script>(function(a){function m(a){window.console&&console.info(a)}function u(){a(\"#replace-form input[name=tables]\").on(\"click\",function(){\"custom\"==a(\"#replace-form input[name=tables]:checked\").val()?a(\"#custom-tables\").removeClass(\"hidden\"):a(\"#custom-tables\").addClass(\"hidden\")})}function v(){q=a(\"#find-replace-rows .row:last\").clone();a(\"#find-replace-add-row\").on(\"click\",function(b){b.preventDefault();a(\"#find-replace-rows\").append(q.clone())});a(document).on(\"click\",\"#find-replace-rows a.text-danger\",
+function(b){b.preventDefault();1<a(\"#find-replace-rows .row\").size()?a(this).parents(\".row\").remove():a(\"#find-replace-rows .row input:text\").val(\"\")});a(\"#find-replace-rows\").sortable({handle:\".glyphicon-align-justify\"});a(\"#find-multisite-rows a.text-danger\").click(function(b){b.preventDefault();b=a(this).parents(\"div.row\");this.is_disabled=this.is_disabled?!1:!0;a(\"input\",b).attr(\"disabled\",this.is_disabled)})}function w(){a(\"#replace-form button.btn-primary\").click(function(b){b.preventDefault();
+b=a(\"#find-replace-rows .row\");for(var c=!1,d=!1,h=0;h<b.size();h++){var k=b[h];a(\".form-group\",k).removeClass(\"has-error\").addClass(\"has-success\");var l=\"\"==a.trim(a(\"input:first\",k).val()),e=\"\"==a.trim(a(\"input:last\",k).val());l&&!e&&(a(\".form-group\",k).addClass(\"has-error\").removeClass(\"has-success\"),c=!0);!l&&e&&(a(\".form-group\",k).addClass(\"has-error\").removeClass(\"has-success\"),d=!0)}if(c&&!alert(\"You specified wrond search input in some of the rows.\\nPlease correct before we can do Magic!\")||
+d&&!confirm(\"You specified empty replace string(s).\\nThis can harm you database.\\nAre you sure you want to continue?\"))return!1;x()})}function x(){var b=a(\"#find-replace-rows .row\"),g=a(\"#find-multisite-rows .row\"),d=a(\"#replace-form input[name=tables]:checked\").val();\"all\"==d&&a(\"#custom-tables select option\").attr(\"selected\",!0);for(var h=a(\"#custom-tables select\").val(),k=a(\"#replace-form input[name=replace_method]:checked\").val(),l=[],e=0;e<b.size();e++){var f=b[e],n=a.trim(a(\"input:first\",f).val()),
+f=a.trim(a(\"input:last\",f).val());l.push([n,f])}b=[];for(e=0;e<g.size();e++)f=g[e],n=a.trim(a(\"input:first\",f).val()),f=a.trim(a(\"input:last\",f).val()),b.push([n,f]);c.formData={search_replace:l,domain_replace:b,tables_choice:d,tables_custom:h,replace_method:k};m(c.formData);p(\"page/run\",{data:c.formData,success:function(b){\"object\"!=typeof b?alert(\"Bad server response\"):b.error?alert(b.error):(a(\".jumbotron\").remove(),a(\"#replace-form\").replaceWith(b.progress_html),c.max=b.progress_max,r())}})}function r(){var b,
+g,d=c.currentStep,h=c.formData.tables_custom.length;0<d&&(c.spinner.stop(),b=a(\"#progress-log .row:last\"),g=c.formData.tables_custom[d-1],b.find(\".text\").html(\'Completed with table <span class=\"text-warning\">\'+g+\"</span>.\"),b.find(\".col-md-1\").html(\'<span class=\"text-success glyphicon glyphicon-ok\"></span>\'));d==h?(m(\"Run in: \"+c.timer+\" sec\"),y()):(g=c.formData.tables_custom[d],c.spinner=(new Spinner(z)).spin(),a(\"#progress-log\").append(\'<div class=\"row\"><div class=\"col-md-1 text-right indicator\"></div><div class=\"col-md-11 text\"></div></div>\'),
+b=a(\"#progress-log .row:last\"),b.find(\".text\").html(\'Processing table <span class=\"text-warning\">\'+g+\"</span>...\"),b.find(\".col-md-1\").append(c.spinner.el),t+=20,a(\"#progress-log\").animate({scrollTop:t},\"fast\"),b=c.formData,b.step=c.currentStep,p(\"process/index\",{data:b,success:function(b){\"object\"==typeof b?(m({table:b.table,rows:b.found+\" > \"+b.updated,\"in\":b[\"in\"]+\"s\"}),c.value+=1*b.found,c.timer+=b[\"in\"],b=Math.round(100*c.value/c.max),a(\".progress-bar\").css(\"width\",b+\"%\").attr(\"aria-valuenow\",
+b)):(m(b),alert(\'Update failed for table \"\'+c.formData.tables_custom[c.currentStep]+\'\"\'));c.currentStep++;r()}}))}function y(){p(\"page/thanks\",{success:function(b){a(\"#running\").replaceWith(b)}})}function p(b,c){c.url=window.location.pathname+\"?r=\"+b;c.type||(c.type=\"POST\");a.ajax(c)}a(document).ready(function(){u();v();w()});var q,c={spinner:null,max:0,value:0,currentStep:0,formData:null,timer:0},z={lines:7,length:6,width:2,radius:2,scale:1,corners:1,color:\"#000\",opacity:.25,rotate:0,direction:1,
+speed:1,trail:60,fps:20,zIndex:2E9,className:\"spinner\",top:\"9px\",left:\"77%\",position:\"absolute\"},t=0})(jQuery);</script>");$wphu_assets["css"] = array("assets/styles.css" => "<style>body{  padding-top: 70px;     padding-bottom: 30px; } .wp-logo{  margin:7px 15px 0 0;  background-color: #eee;   border-radius: 50%; } .jumbotron .alert {  margin-bottom: 0; } #replace-form fieldset .row .glyphicon {  margin-top: 9px; } #replace-form .glyphicon-align-justify {  cursor: move; } #progress-log {  max-height: 200px;  overflow-y: auto;  overflow-x: hidden; } #progress-log .row .col-md-1{  position: relative; } .bs-callout {     padding: 20px 20px 10px;     margin: 20px 0;     border: 1px solid #eee;     border-left-width: 5px;     border-radius: 3px; } .bs-callout h4 {     margin-top: 0;     margin-bottom: 5px; } .bs-callout-warning {     border-left-color: #aa6708; } .bs-callout-warning h4 {     color: #aa6708; } </style>");
 define('APP_PATH', dirname(__FILE__));
 define('VIEWS_PATH', APP_PATH . '/views');
 define('WP_INSTALLING', true);
@@ -492,57 +493,68 @@ public function actionThanks()
 }
 class ProcessController extends BaseController
 {
+	const PER_PAGE = 5000;
 	protected $skipRules;
 public function actionIndex()
 	{
 		set_time_limit(0);
+		$metric_start = microtime(true);
 global $wpdb;
 		$tables = $_POST['tables_custom'];
 		$step = $_POST['step'];
 		$to_replace = $_POST['search_replace'];
 		$blogs_replace = $this->prepareBlogReplace(@$_POST['domain_replace']);
 		$current_table = $tables[$step];
-		$clean_table_name = strtolower(preg_replace("/^$wpdb->prefix/", '', $current_table));
+		$clean_table_name = strtolower(preg_replace("/^$wpdb->prefix(\d+\_)?/", '', $current_table));
 		$replace_method = ($_POST['replace_method'] == 'full')? 'full' : 'simple';
 		if ( $replace_method == 'simple' ) $this->prepareSkipRules();
-		$updated_tables = 0;
-		$select = "SELECT " . $current_table . ".* FROM " . $current_table;
-		$datas = $wpdb->get_results($select);
+		$updated_rows = 0;
 		$primary_keys = $wpdb->get_results("SHOW KEYS FROM `$current_table` WHERE Key_name = 'PRIMARY'");
-		foreach ( $datas as $row ) {
-			$update = "UPDATE $current_table SET ";
-			$update_values = array();
-			$i = 1;
-			foreach ( $row as $key => $value ) {
-				if ( $primary_keys[0]->Column_name == $key ) {
-					$where = " WHERE $key=$value";
+		$select_count_query = "SELECT COUNT(*) as rowscnt FROM $current_table";
+		$rows_cnt = $wpdb->get_var($select_count_query);
+		$select_query = "SELECT * FROM $current_table";
+		$select_limit = self::PER_PAGE;
+		$select_offset = 0;
+		while ( $select_offset < $rows_cnt ) {
+			$db_rows = $wpdb->get_results("$select_query LIMIT $select_limit OFFSET $select_offset");
+			foreach ( $db_rows as $row ) {
+				$update_query = "UPDATE $current_table SET ";
+				$update_values = array();
+				$i = 1;
+				foreach ( $row as $key => $value ) {
+					if ( $primary_keys[0]->Column_name == $key ) {
+						$where = " WHERE $key=$value";
+						$i++;
+						continue;
+					}
+					if ( $replace_method == 'simple' && $this->canSkipColumn($clean_table_name, $key, $value) ) {
+						continue;
+					}
+					if ( $current_table == $wpdb->blogs || $current_table == $wpdb->site ) {
+						$new_value = ReplaceHelper::replace($value, $blogs_replace);
+					}
+					else {
+						$new_value = ReplaceHelper::recursiveReplace($value, $to_replace);
+					}
+					if ( strcmp($new_value, $value) == 0 ) {
+						continue;
+					}
+					$update_values[] =  $key . "='" . sql_add_slashes($new_value) . "'";
 					$i++;
-					continue;
 				}
-				if ( $replace_method == 'simple' && $this->canSkipColumn($clean_table_name, $key, $value) ) {
-					continue;
-				}
-				if ( $current_table == $wpdb->blogs || $current_table == $wpdb->site ) {
-					$new_value = ReplaceHelper::replace($value, $blogs_replace);
-				}
-				else {
-					$new_value = ReplaceHelper::recursiveReplace($value, $to_replace);
-				}
-				if ( strcmp($new_value, $value) == 0 ) {
-					continue;
-				}
-				$update_values[] =  $key . "='" . sql_add_slashes($new_value) . "'";
-				$i++;
+				if (empty($update_values)) continue;
+				$update_query .= implode(',', $update_values);
+				$wpdb->query($update_query . $where);
+				$updated_rows++;
 			}
-			if (empty($update_values)) continue;
-			$update .= implode(',', $update_values);
-			$wpdb->query($update . $where);
-			$updated_tables++;
+			$select_offset += $select_limit;
 		}
+		$metric_end = microtime(true);
 		return $this->responseJson(array(
-			'table' => $clean_table_name,
-			'found' => count($datas),
-			'updated' => $updated_tables,
+			'table' => $current_table,
+			'found' => $rows_cnt,
+			'updated' => $updated_rows,
+			'in' => round($metric_end - $metric_start, 3),
 			//'last' => !empty($update_values)? $update_values : null,
 		));
 	}
@@ -579,7 +591,7 @@ protected function canSkipColumn($table, $column, $value)
 				'term_relationships',
 			),
 			'$' => array(
-				'_?log', '_?logs',
+				'_log', '_logs',
 			),
 		);
 		$this->skipRules['tables_columns'] = array(
